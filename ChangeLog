@@ -1,3 +1,15 @@
+2003-03-30  Kingpin  <mthurn@megapipe.net>
+
+	* lib/WWW/Search/AltaVista/News.pm (native_setup_search): new search URL
+
+	* lib/WWW/Search/AltaVista.pm (native_retrieve_some): fix parsing of NEXT link; ignore image links
+
+2003-01-08  Kingpin  <mthurn@carbon>
+
+	* lib/WWW/Search/AltaVista.pm (gui_query): new method
+	(native_setup_search): new URL options
+	(native_retrieve_some): parse new output format
+
 2002-08-21  Kingpin  <mthurn@copper.dulles.tasc.com>
 
 	* lib/WWW/Search/AltaVista.pm (native_retrieve_some): bail out if page says 0 hits

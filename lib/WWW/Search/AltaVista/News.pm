@@ -1,7 +1,7 @@
 # News.pm
 # by John Heidemann
 # Copyright (C) 1996 by USC/ISI
-# $Id: News.pm,v 1.3 2001/09/21 13:47:43 mthurn Exp $
+# $Id: News.pm,v 1.4 2003-03-30 17:34:28-05 kingpin Exp kingpin $
 #
 # Complete copyright notice follows below.
 
@@ -52,11 +52,7 @@ THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 
-
 =cut
-#'
-
-
 
 #####################################################################
 
@@ -70,19 +66,19 @@ use WWW::Search::AltaVista;
 
 # private
 sub native_setup_search
-{
-    my($self) = shift;
-    if (!defined($self->{_options})) {
-	$self->{_options} = {
-                             pg => 'q',
-                             'text' => 'yes',
-                             # what => 'news',
-                             fmt => 'd',
-                             'search_url' => 'http://news.altavista.com/search',
-                            };
+  {
+  my $self = shift;
+  my $sQuery = shift;
+  if (!defined($self->{_options})) {
+    $self->{_options} = {
+                         'nbq' => '50',
+                         'q' => $sQuery,
+                         'search_host' => 'http://news.altavista.com',
+                         'search_path' => '/news/search',
+                        };
     };
-    # let AltaVista.pm finish up the hard work.
-    return $self->SUPER::native_setup_search(@_);
-}
+  # Let AltaVista.pm finish up the hard work:
+  return $self->SUPER::native_setup_search($sQuery, @_);
+  } # native_setup_search
 
 1;
