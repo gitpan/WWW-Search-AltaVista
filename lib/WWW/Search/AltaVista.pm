@@ -232,7 +232,7 @@ sub native_setup_search
   $self->{_debug} = 2 if ($options_ref->{'search_parse_debug'});
   $self->{_debug} = 0 if (!defined($self->{_debug}));
   # Pattern for matching result-count in many languages:
-  $self->{'_qr_count'} = qr{\s(?:found|fand).+?([\d,]+)\s+(result|headline|Ergebnisse)};
+  $self->{'_qr_count'} = qr{\s(?:found|fand).+?([\d.,]+)\s+(result|headline|Ergebnisse)};
 
   # Finally figure out the url.
   $self->{_base_url} =
@@ -318,7 +318,7 @@ sub parse_tree
       if ($s =~ m!$self->{_qr_count}!i)
         {
         my $iCount = $1;
-        $iCount =~ s!,!!g;
+        $iCount =~ tr!.,!!d;
         $self->approximate_result_count($iCount);
         last DIV_TAG;
         } # if

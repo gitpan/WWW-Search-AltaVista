@@ -6,10 +6,11 @@ BEGIN { use_ok('WWW::Search::Test') };
 BEGIN { use_ok('WWW::Search::AltaVista') };
 BEGIN { use_ok('WWW::Search::AltaVista::DE') };
 
-# goto DEBUG_NOW;
-
 # goto SKIP_BASIC;
 &my_engine('AltaVista::DE');
+
+# goto DEBUG_NOW;
+
 my $debug = 0;
 # These tests return no results (but we should not get an HTTP error):
 &my_test(0, $WWW::Search::Test::bogus_query, 0, 0, $debug);
@@ -31,6 +32,7 @@ foreach my $oResult (@ao)
   cmp_ok($oResult->description, 'ne', '',
          'result description is not empty');
   } # foreach
+DEBUG_NOW:
 # The following query returns many pages of results:
 $debug = 0;
 &my_test(0, 'Thurn', 101, undef, $debug);

@@ -1,4 +1,10 @@
+2003-12-16  Kingpin  <mthurn@verizon.net>
+
+	* lib/WWW/Search/AltaVista.pm (native_setup_search): add . to result-count patterns (thanks to Andre Halama)
+
 2003-11-24  Kingpin  <mthurn@verizon.net>
+
+	* lib/WWW/Search/AltaVista/News.pm (parse_tree): new method
 
 	* t/de.t: add content tests; call env_proxy()
 	
