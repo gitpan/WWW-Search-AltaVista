@@ -2,7 +2,7 @@
 # AdvancedWeb.pm
 # by Jim Smyser
 # Copyright (c) 1999 by Jim Smyser & USC/ISI
-# $Id: AdvancedWeb.pm,v 1.5 2001/11/30 22:03:26 mthurn Exp $
+# $Id: AdvancedWeb.pm,v 1.5 2001/11/30 22:03:26 mthurn Exp mthurn $
 #############################################################
 
 
@@ -246,16 +246,19 @@ sub native_retrieve_some {
         my($url,$title) = ($1,$2);
         ($hit, $raw) = $self->begin_new_hit($hit, $raw);
         $hits_found++;
-        $hit->add_url($url);
+        $hit->add_url(&WWW::Search::unescape_query($url));
         $hit->title($title);
         print STDERR "PARSE(13:INHIT): title: $1.\n" if ($self->{_debug} >= 2);
     } elsif ($state == $HITS && /^<br>/i) {
     } elsif ($state == $HITS && /^([\d|\w|<b>|\.].+)<br>/i) {
         $raw .= $_;
+        ($hit, $raw) = $self->begin_new_hit($hit, $raw) unless ref($hit);
         $hit->description($1);
         print STDERR "PARSE(13:INHIT): description.\n" if ($self->{_debug} >= 2);
     } elsif ($state == $HITS && /^URL:\s(.*)$/i) { #"
         $raw .= $_;
+        ($hit, $raw) = $self->begin_new_hit($hit, $raw) unless ref($hit);
+        $hit->add_url($url);
         print STDERR "PARSE(13:INHIT): url: $1.\n" if ($self->{_debug} >= 2);
     } elsif ($state == $HITS && /^<!-- res_extend.wm -->/i) {
         $raw .= $_;

@@ -1,3 +1,8 @@
+2002-02-19  Kingpin  <mthurn@copper.dulles.tasc.com>
+
+	* lib/WWW/Search/AltaVista/AdvancedWeb.pm (native_retrieve_some): unescape URL
+	(native_retrieve_some): BUGFIX for undefined $hit (?)
+
 2001-12-11  Kingpin  <mthurn@copper.dulles.tasc.com>
 
 	* lib/WWW/Search/AltaVista.pm (native_retrieve_some): unescape URL
