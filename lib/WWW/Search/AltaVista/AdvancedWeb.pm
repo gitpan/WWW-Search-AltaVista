@@ -2,7 +2,7 @@
 # AdvancedWeb.pm
 # by Jim Smyser
 # Copyright (c) 1999 by Jim Smyser & USC/ISI
-# $Id: AdvancedWeb.pm,v 1.6 2002/02/19 15:52:27 mthurn Exp $
+# $Id: AdvancedWeb.pm,v 1.7 2002/08/20 18:27:27 mthurn Exp $
 #############################################################
 
 
@@ -117,7 +117,7 @@ require Exporter;
 @EXPORT = qw();
 @EXPORT_OK = qw();
 @ISA = qw(WWW::Search::AltaVista Exporter);
-$VERSION = '2.07';
+$VERSION = '2.08';
 use WWW::Search::AltaVista;
 use WWW::Search(generic_option);
 
@@ -132,15 +132,20 @@ sub native_setup_search
     # Upper case all lower case Boolean operators. Be nice if
     # I could just uppercase the entire string, but this may
     # have undesirable search side effects. 
-    if (!defined($self->{_options})) {
-    $self->{_options} = {
-        'pg' => 'aq',
-        'kl' => 'XX',
-	    'nbq' => '50',
-        'q' => $native_query,
-         'search_url' => 'http://www.altavista.com/cgi-bin/query',
-        }
-        }
+    if (!defined($self->{_options}))
+      {
+      $self->{_options} = 
+        {
+         'pg' => 'aq',
+         'avkw' => 'tgz',
+         'aqmode' => 'b',
+         'kl' => 'XX',
+         'nbq' => 50,
+         'd2' => 0,
+         'aqb' => $native_query,
+         'search_url' => 'http://www.altavista.com/sites/search/web',
+        };
+      } # if
     my($options_ref) = $self->{_options};
     if (defined($native_options_ref)) {
     # Copy in new options.
@@ -180,126 +185,10 @@ sub native_setup_search
     "r=" . $native_query;
     }
 
-# private
-sub save_old_hit {
-    my($self) = shift;
-    my($old_hit) = shift;
-    my($old_raw) = shift;
+# All other methods are inherited from WWW::Search::AltaVista
 
-    if (defined($old_hit)) {
-    $old_hit->raw($old_raw) if (defined($old_raw));
-    push(@{$self->{cache}}, $old_hit);
-    };
-
-    return(undef, undef);
-}
-
-# private
-sub begin_new_hit
-{
-    my($self) = shift;
-    my($old_hit) = shift;
-    my($old_raw) = shift;
-
-    $self->save_old_hit($old_hit, $old_raw);
-
-    # Make a new hit.
-    return (new WWW::SearchResult, '');
-    }
-
-# private
-sub native_retrieve_some {
-    my ($self) = @_;
-
-    # fast exit if already done
-    return undef if (!defined($self->{_next_url}));
-
-    # get some
-    print STDERR "WWW::Search::AltaVista::native_retrieve_some: fetching " . $self->{_next_url} . "\n" if ($self->{_debug});
-    my($response) = $self->http_request('GET', $self->{_next_url});
-    $self->{response} = $response;
-    if (!$response->is_success) {
-    return undef;
-    };
-    # parse the output
-    my($HEADER, $HITS, $INHIT, $TRAILER, $POST_NEXT) = (1..10);  # order matters
-    my($hits_found) = 0;
-    my($state) = ($HEADER);
-    my($hit) = undef;
-    my($raw) = '';
-    foreach ($self->split_lines($response->content())) {
-        next if m@^$@; # short circuit for blank lines
-    ######
-    # HEADER PARSING: find the number of hits
-    #
-    if (0) {
-    } elsif ($state == $HEADER && /We found.*?([\d,]+) results:/i) {
-        # Modified by Jim
-        my($n) = $1;
-        $n =~ s/,//g;
-        $self->approximate_result_count($n);
-        $state = $HITS;
-        print STDERR "PARSE(10:HEADER->HITS): $n documents found.\n" if ($self->{_debug} >= 2);
-    ######
-    # HITS PARSING: find each hit
-    #
-    } elsif ($state == $HITS && /r=(.*?)"\s.*?">(.*)<\/a>/i) {
-        $raw .= $_;
-        my($url,$title) = ($1,$2);
-        ($hit, $raw) = $self->begin_new_hit($hit, $raw);
-        $hits_found++;
-        $hit->add_url(&WWW::Search::unescape_query($url));
-        $hit->title($title);
-        print STDERR "PARSE(13:INHIT): title: $1.\n" if ($self->{_debug} >= 2);
-    } elsif ($state == $HITS && /^<br>/i) {
-    } elsif ($state == $HITS && /^([\d|\w|<b>|\.].+)<br>/i) {
-        $raw .= $_;
-        ($hit, $raw) = $self->begin_new_hit($hit, $raw) unless ref($hit);
-        $hit->description($1);
-        print STDERR "PARSE(13:INHIT): description.\n" if ($self->{_debug} >= 2);
-    } elsif ($state == $HITS && /^URL:\s(.*)$/i) { #"
-        $raw .= $_;
-        ($hit, $raw) = $self->begin_new_hit($hit, $raw) unless ref($hit);
-        $hit->add_url($url);
-        print STDERR "PARSE(13:INHIT): url: $1.\n" if ($self->{_debug} >= 2);
-    } elsif ($state == $HITS && /^<!-- res_extend.wm -->/i) {
-        $raw .= $_;
-        ($hit, $raw) = $self->save_old_hit($hit, $raw);
-        $state = $TRAILER;
-        print STDERR "PARSE(13:INHIT->HITS): end hit.\n" if ($self->{_debug} >= 2);
-    } elsif ($state == $HITS) {
-        # other random stuff in a hit---accumulate it
-        $raw .= $_;
-        print STDERR "PARSE(14:INHIT): no match.\n" if ($self->{_debug} >= 2);
-            print STDERR ' 'x 12, "$_\n" if ($self->{_debug} >= 3);
-    } elsif ($hits_found && ($state == $TRAILER || $state == $HITS) && /<a[^>]+href="([^"]+)".*\&gt;\&gt;/i) { # "
-        # (above, note the trick $hits_found so we don't prematurely terminate.)
-        # set up next page
-        my($relative_url) = $1;
-        # hack:  make sure fmt=d stays on news URLs
-        $relative_url =~ s/what=news/what=news\&fmt=d/ if ($relative_url !~ /fmt=d/i);
-        $self->{_next_url} = $HTTP::URI_CLASS->new_abs($relative_url, $self->{_base_url});
-        $state = $POST_NEXT;
-        print STDERR "PARSE(15:->POST_NEXT): found next, $n.\n" if ($self->{_debug} >= 2);
-    } else {
-        # accumulate raw
-        $raw .= $_;
-        print STDERR "PARSE(RAW): $_\n" if ($self->{_debug} >= 3);
-    };
-    };
-    if ($state != $POST_NEXT) {
-    # end, no other pages (missed ``next'' tag)
-    if ($state == $HITS) {
-        $self->begin_new_hit($hit, $raw);   # save old one
-        print STDERR "PARSE: never got to TRAILER.\n" if ($self->{_debug} >= 2);
-    };
-    $self->{_next_url} = undef;
-    };
-
-    # sleep so as to not overload altavista
-    $self->user_agent_delay if (defined($self->{_next_url}));
-
-    return $hits_found;
-}
 1;
 
+__END__
+
+http://www.altavista.com/sites/search/web?pg=aq&avkw=tgz&aqa=&aqp=&aqn=&aqmode=b&aqb=LSAM+AND+AutoSearch&aqs=&kl=XX&dt=tmperiod&d2=0&d0=&d1=&rc=rgn&sgr=all&swd=&lh=&nbq=50

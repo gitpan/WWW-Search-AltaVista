@@ -1,3 +1,13 @@
+2002-08-21  Kingpin  <mthurn@copper.dulles.tasc.com>
+
+	* lib/WWW/Search/AltaVista.pm (native_retrieve_some): bail out if page says 0 hits
+
+2002-08-20  Kingpin  <mthurn@copper.dulles.tasc.com>
+
+	* lib/WWW/Search/AltaVista/AdvancedWeb.pm (native_setup_search): new CGI options
+
+	* lib/WWW/Search/AltaVista.pm (native_retrieve_some): update for slightly changed output format
+
 2002-07-18  Kingpin  <mthurn@copper.dulles.tasc.com>
 
 	* lib/WWW/Search/AltaVista/NL.pm: delete un-parsable email from bottom of file

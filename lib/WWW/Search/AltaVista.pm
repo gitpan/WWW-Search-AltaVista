@@ -1,7 +1,7 @@
 # AltaVista.pm
 # by John Heidemann
 # Copyright (C) 1996-1998 by USC/ISI
-# $Id: AltaVista.pm,v 1.7 2002/03/25 15:51:45 mthurn Exp $
+# $Id: AltaVista.pm,v 1.9 2002/08/21 13:21:55 mthurn Exp $
 #
 # Complete copyright notice follows below.
 
@@ -77,7 +77,7 @@ or the specialized AltaVista searches described in options.
 C<WWW::Search::AltaVista> was written by John Heidemann,
 <johnh@isi.edu>.
 C<WWW::Search::AltaVista> is maintained by Martin Thurn,
-<mthurn@tasc.com>.
+<mthurn@cpan.org>.
 
 =head1 COPYRIGHT
 
@@ -105,7 +105,7 @@ require Exporter;
 @EXPORT = qw();
 @EXPORT_OK = qw();
 @ISA = qw(WWW::Search Exporter);
-$VERSION = '2.25';
+$VERSION = '2.26';
 
 use Carp ();
 use WWW::Search qw( generic_option unescape_query );
@@ -227,23 +227,26 @@ sub native_retrieve_some
     foreach ($self->split_lines($response->content()))
       {
       next if m@^$@; # short circuit for blank lines
+      print STDERR "PARSE(0:RAW): $_\n" if ($self->{_debug} >= 3);
+      if (0) { }
+
       ######
       # HEADER PARSING: find the number of hits
       #
-      print STDERR "PARSE(0:RAW): $_\n" if ($self->{_debug} >= 3);
-      if (0) { }
-      elsif ($state == $HEADER && /We found.*?([\d,]+) (results?|headlines?):/i)
+      elsif ($state == $HEADER && /(?:AltaVista|We)\s+found.*?([\d,]+)\s+(results?|headlines?)/i)
         {
         # Modified by Jim
         my($n) = $1;
         $n =~ s/,//g;
         $self->approximate_result_count($n);
-        $state = $HITS;
         print STDERR "PARSE(10:HEADER->HITS): $n documents found.\n" if ($self->{_debug} >= 2);
+        return 0 unless 0 < $n;
+        $state = $HITS;
+        }
+
         ######
         # HITS PARSING: find each hit
         #
-        }
       elsif ($state == $HITS && /r=(.*?)"\s.*?">(.*)<\/a>/i)
         {
         $raw .= $_;
@@ -268,20 +271,31 @@ sub native_retrieve_some
     elsif ($state == $HITS && /^URL:\s(.*)$/i) { #"
         $raw .= $_;
         print STDERR "PARSE(13:INHIT): url: $1.\n" if ($self->{_debug} >= 2);
-    } elsif ($state == $HITS && /^<!-- res_extend.wm -->/i) {
-        $raw .= $_;
+
+        }
+      # Look for end of hits list:
+      elsif (($state == $HITS)
+             &&
+             (
+              /^<!-- res_extend.wm -->/i
+              ||
+              m!<a\s+href="/r\?ext24"!i
+              ||
+              m!<a\s+href="http://jump.altavista.com/rlweb_ebay.go!i
+             )
+            )
+        {
         ($hit, $raw) = $self->save_old_hit($hit, $raw);
         $state = $TRAILER;
         print STDERR "PARSE(13:INHIT->HITS): end hit.\n" if ($self->{_debug} >= 2);
-    } elsif ($state == $HITS) {
-        # other random stuff in a hit---accumulate it
-        $raw .= $_;
-        print STDERR "PARSE(14:INHIT): no match.\n" if ($self->{_debug} >= 2);
-            print STDERR ' 'x 12, "$_\n" if ($self->{_debug} >= 3);
-    } elsif ($hits_found && ($state == $TRAILER || $state == $HITS) && /<a[^>]+href="([^"]+)".*\&gt;\&gt;/i) { # "
+        }
+      elsif ($hits_found && ($state == $TRAILER || $state == $HITS) && /<a[^>]+href="([^"]+)".*\&gt;\&gt;/i) { # "
         # (above, note the trick $hits_found so we don't prematurely terminate.)
         # set up next page
         my($relative_url) = $1;
+        # Actual line of input:
+        # &nbsp; <a href="/cgi-bin/query?pg=q&amp;nbq=50&amp;what=web&amp;text=yes&amp;fmt=d&amp;q=Martin+Thurn&stq=50" target="_self">[Next &gt;&gt;]</a> 
+
         print STDERR "PARSE(15:->POST_NEXT): raw next_url is $relative_url\n" if ($self->{_debug} >= 2);
         # hack:  make sure fmt=d stays on news URLs
         $relative_url =~ s/what=news/what=news\&fmt=d/ if ($relative_url !~ /fmt=d/i);
@@ -292,6 +306,11 @@ sub native_retrieve_some
         $self->{_next_url} = $HTTP::URI_CLASS->new_abs($relative_url, $self->{_base_url});
         $state = $POST_NEXT;
         print STDERR "PARSE(15:->POST_NEXT): cooked next_url is $n.\n" if ($self->{_debug} >= 2);
+    } elsif ($state == $HITS) {
+        # other random stuff in a hit---accumulate it
+        $raw .= $_;
+        print STDERR "PARSE(14:INHIT): no match.\n" if ($self->{_debug} >= 2);
+            print STDERR ' 'x 12, "$_\n" if ($self->{_debug} >= 3);
     } else {
         # accumulate raw
         $raw .= $_;

@@ -9,7 +9,7 @@ use WWW::Search::Test qw( new_engine run_test );
 # Change 1..1 below to 1..last_test_to_print .
 # (It may become useful if the test is moved to ./t subdirectory.)
 
-BEGIN { $| = 1; print "1..25\n"; }
+BEGIN { $| = 1; print "1..21\n"; }
 END { print "not ok 1\n" unless $loaded; }
 use WWW::Search::AltaVista;
 $loaded = 1;
@@ -53,7 +53,7 @@ my $debug = 0;
 # This query returns 1 page of results:
 &run_test('LS'.'AM AND Aut'.'oSearch', 2, 9, $debug);
 # This query returns 2 pages of results:
-&run_test('LSA'.'M and IS'.'I and I'.'B', 11, 19, $debug);
+&run_test('LSA'.'M and I'.'B', 11, 19, $debug);
 # This query returns 3 (or more) pages of results:
 &run_test('Ma'.'rtin', 21, undef, $debug);
 SKIP_ADVANCEDWEB:
@@ -70,15 +70,18 @@ $debug = 0;
 &run_test('li'.'nux', 31, undef, $debug);
 SKIP_NEWS:
 
-# goto SKIP_ADVANCEDNEWS;
+# As of 2002-08, altavista.com does not have an Advanced search for
+# news.
+goto SKIP_ADVANCEDNEWS;
 &new_engine('AltaVista::AdvancedNews');
-my $debug = 0;
+$debug = 0;
 # These tests return no results (but we should not get an HTTP error):
 &run_test($WWW::Search::Test::bogus_query, 0, 0, $debug);
 &run_test("+perl +$WWW::Search::Test::bogus_query", 0, 0, $debug);
 # This query returns 1 page of results:
 # This query returns 2 pages of results:
 # This query returns 3 (or more) pages of results:
+$debug = 99;
 &run_test('li'.'nux', 61, undef, $debug);
 SKIP_ADVANCEDNEWS:
 
