@@ -1,7 +1,7 @@
 # AltaVista.pm
 # by John Heidemann
 # Copyright (C) 1996-1998 by USC/ISI
-# $Id: AltaVista.pm,v 1.6 2001/12/11 19:51:03 mthurn Exp mthurn $
+# $Id: AltaVista.pm,v 1.7 2002/03/25 15:51:45 mthurn Exp $
 #
 # Complete copyright notice follows below.
 

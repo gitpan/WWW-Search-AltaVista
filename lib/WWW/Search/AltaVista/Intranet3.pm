@@ -1,6 +1,5 @@
 # AltaVista/Intranet3.pm
-# by Martin Thurn
-# $Id: Intranet.pm,v 1.7 2000/03/09 16:07:08 mthurn Exp $
+# $Id: Intranet3.pm,v 1.2 2002/03/29 21:33:31 mthurn Exp $
 #
 # Complete copyright notice follows below.
 
@@ -46,8 +45,6 @@ intranet.  (How's that for an excuse? ;-)
 
 =head1 AUTHOR
 
-C<WWW::Search::AltaVista::Intranet> 
-was written by Martin Thurn <MartinThurn@iname.com>
 
 =head1 COPYRIGHT
 
@@ -99,9 +96,8 @@ require Exporter;
 @ISA = qw(WWW::Search::AltaVista Exporter);
 $VERSION = '2.04';
 
-$MAINTAINER = 'Martin Thurn <MartinThurn@iname.com>';
 $TEST_CASES = <<"ENDTESTCASES";
-&no_test('AltaVista::Intranet', '$MAINTAINER');
+&no_test('AltaVista::Intranet3', '$MAINTAINER');
 ENDTESTCASES
 
 use WWW::Search::AltaVista;
@@ -312,19 +308,4 @@ sub native_retrieve_some
 1;
 
 __END__
-
-Here is a complete URL:
-
-... not yet updated ....
-
-
-http://copper.dulles.tasc.com:9000/cgi-bin/query?mss=simple&pg=q&what=web&user=searchintranet&text=yes&enc=iso88591&filter=intranet&kl=XX&q=forensics&act=Search
-
-This is the barest-bones version that still works:
-
-http://copper.dulles.tasc.com:9000/cgi-bin/query?mss=simple&text=yes&q=giraffe
-
-This is what we are generating with WWW::Search 2.06:
-
-http://copper:9000/cgi-bin/query?fmt=&mss=simple&pg=q&text=yes&what=web&q=giraffe
 

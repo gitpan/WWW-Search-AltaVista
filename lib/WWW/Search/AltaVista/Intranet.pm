@@ -1,6 +1,6 @@
 # AltaVista/Intranet.pm
 # by Martin Thurn
-# $Id: Intranet.pm,v 1.7 2000/03/09 16:07:08 mthurn Exp $
+# $Id: Intranet.pm,v 1.8 2002/03/29 21:29:50 mthurn Exp $
 #
 # Complete copyright notice follows below.
 
@@ -46,14 +46,14 @@ intranet.  (How's that for an excuse? ;-)
 
 =head1 AUTHOR
 
-C<WWW::Search::AltaVista::Intranet> 
-was written by Martin Thurn <MartinThurn@iname.com>
+C<WWW::Search::AltaVista::Intranet>
+was written by Martin Thurn <mthurn@cpan.org>
 
 =head1 COPYRIGHT
 
 Copyright (c) 1996 University of Southern California.
-All rights reserved.                                            
-                                                               
+All rights reserved.
+
 Redistribution and use in source and binary forms are permitted
 provided that the above copyright notice and this paragraph are
 duplicated in all such forms and that any documentation, advertising
@@ -99,7 +99,7 @@ require Exporter;
 @ISA = qw(WWW::Search::AltaVista Exporter);
 $VERSION = '2.04';
 
-$MAINTAINER = 'Martin Thurn <MartinThurn@iname.com>';
+$MAINTAINER = 'Martin Thurn <mthurn@cpan.org>';
 $TEST_CASES = <<"ENDTESTCASES";
 &no_test('AltaVista::Intranet', '$MAINTAINER');
 ENDTESTCASES
