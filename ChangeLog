@@ -1,3 +1,12 @@
+2001-11-30  Kingpin  <mthurn@copper.dulles.tasc.com>
+
+	* lib/WWW/Search/AltaVista/Intranet3.pm: new backend supplied by Peter von Burg
+
+	* lib/WWW/Search/AltaVista.pm (native_retrieve_some): do not use URI::URL
+	(native_setup_search): reorder CGI args for Intranet3.pm
+
+	* lib/WWW/Search/AltaVista/AdvancedWeb.pm (native_retrieve_some): do not use URI::URL
+
 2001-10-09  Kingpin  <mthurn@copper.dulles.tasc.com>
 
 	* lib/WWW/Search/AltaVista.pm (native_retrieve_some): BUGFIX for death when seeing (bogus) description without a URL

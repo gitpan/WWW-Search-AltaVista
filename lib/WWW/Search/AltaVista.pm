@@ -1,7 +1,7 @@
 # AltaVista.pm
 # by John Heidemann
 # Copyright (C) 1996-1998 by USC/ISI
-# $Id: AltaVista.pm,v 1.4 2001/10/09 19:45:23 mthurn Exp $
+# $Id: AltaVista.pm,v 1.5 2001/11/30 22:04:08 mthurn Exp $
 #
 # Complete copyright notice follows below.
 
@@ -105,7 +105,7 @@ require Exporter;
 @EXPORT = qw();
 @EXPORT_OK = qw();
 @ISA = qw(WWW::Search Exporter);
-$VERSION = '2.22';
+$VERSION = '2.23';
 
 use Carp ();
 use WWW::Search(generic_option);
@@ -126,43 +126,51 @@ sub native_setup_search
   $self->{_next_to_retrieve} = 0;
   # set the text=yes option to provide next links with <a href>
   # (suggested by Guy Decoux <decoux@moulon.inra.fr>).
-    if (!defined($self->{_options})) {
+  if (!defined($self->{_options}))
+    {
     $self->{_options} = {
-        'pg' => 'q',
-        'text' => 'yes',
-        'what' => 'web',
-        'fmt' => 'd',
-        'nbq' => '50',
-        'search_url' => 'http://www.altavista.com/cgi-bin/query',
-        };
-    };
-    my($options_ref) = $self->{_options};
-    if (defined($native_options_ref)) {
+                         'pg' => 'q',
+                         'text' => 'yes',
+                         'what' => 'web',
+                         'fmt' => 'd',
+                         'nbq' => '50',
+                         'search_url' => 'http://www.altavista.com/cgi-bin/query',
+                        };
+    } # if
+  my($options_ref) = $self->{_options};
+  if (defined($native_options_ref))
+    {
     # Copy in new options.
-    foreach (keys %$native_options_ref) {
-        $options_ref->{$_} = $native_options_ref->{$_};
-    };
-    };
-    # Process the options.
-    # (Now in sorted order for consistency regarless of hash ordering.)
-    my($options) = '';
-    foreach (sort keys %$options_ref) {
+    foreach (keys %$native_options_ref)
+      {
+      $options_ref->{$_} = $native_options_ref->{$_};
+      } # foreach
+    } # if
+  # Process the options.
+  my $options = '';
+  # For Intranet search to work, mss option must be first:
+  if (exists $options_ref->{'mss'})
+    {
+    $options .= 'mss=' . $options_ref->{'mss'} . '&';
+    } # if
+  foreach my $key (keys %$options_ref)
+    {
     # printf STDERR "option: $_ is " . $options_ref->{$_} . "\n";
-    next if (generic_option($_));
-    $options .= $_ . '=' . $options_ref->{$_} . '&';
-    };
-    $self->{_debug} = $options_ref->{'search_debug'};
-    $self->{_debug} = 2 if ($options_ref->{'search_parse_debug'});
-    $self->{_debug} = 0 if (!defined($self->{_debug}));
+    next if (generic_option($key));
+    next if $key eq 'mss';
+    $options .= $key . '=' . $options_ref->{$key} . '&';
+    } # foreach
+  $self->{_debug} = $options_ref->{'search_debug'};
+  $self->{_debug} = 2 if ($options_ref->{'search_parse_debug'});
+  $self->{_debug} = 0 if (!defined($self->{_debug}));
 
-    # Finally figure out the url.
-    $self->{_base_url} = 
-    $self->{_next_url} =
-    $self->{_options}{'search_url'} .
-    "?" . $options .
-    "q=" . $native_query;
-    print STDERR $self->{_base_url} . "\n" if ($self->{_debug});
-}
+  # Finally figure out the url.
+  $self->{_base_url} =
+  $self->{_next_url} =
+  $self->{_options}{'search_url'} .'?'. $options .'q='. $native_query;
+  print STDERR $self->{_base_url} . "\n" if ($self->{_debug});
+  } # native_setup_search
+
 
 # private
 sub save_old_hit {
@@ -277,11 +285,11 @@ sub native_retrieve_some
         print STDERR "PARSE(15:->POST_NEXT): raw next_url is $relative_url\n" if ($self->{_debug} >= 2);
         # hack:  make sure fmt=d stays on news URLs
         $relative_url =~ s/what=news/what=news\&fmt=d/ if ($relative_url !~ /fmt=d/i);
-        # Not sure why this is necessary.  BUT I *have* seen altavista.com spit out double-encoded URLs!  I.e. they contain &amp;amp; !!
+        # Not sure why this is necessary.  BUT I *have* seen
+        # altavista.com spit out double-encoded URLs!  I.e. they
+        # contain &amp;amp; !!
         $relative_url =~ s!&amp;!&!g;
-        my $n = new URI::URL($relative_url, $self->{_base_url});
-        $n = $n->abs;
-        $self->{_next_url} = $n;
+        $self->{_next_url} = $HTTP::URI_CLASS->new_abs($relative_url, $self->{_base_url});
         $state = $POST_NEXT;
         print STDERR "PARSE(15:->POST_NEXT): cooked next_url is $n.\n" if ($self->{_debug} >= 2);
     } else {

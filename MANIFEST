@@ -6,6 +6,7 @@ lib/WWW/Search/AltaVista.pm
 lib/WWW/Search/AltaVista/AdvancedNews.pm
 lib/WWW/Search/AltaVista/AdvancedWeb.pm
 lib/WWW/Search/AltaVista/Intranet.pm
+lib/WWW/Search/AltaVista/Intranet3.pm
 lib/WWW/Search/AltaVista/NL.pm
 lib/WWW/Search/AltaVista/News.pm
 lib/WWW/Search/AltaVista/Web.pm

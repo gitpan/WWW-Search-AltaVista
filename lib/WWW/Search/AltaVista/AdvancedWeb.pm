@@ -2,7 +2,7 @@
 # AdvancedWeb.pm
 # by Jim Smyser
 # Copyright (c) 1999 by Jim Smyser & USC/ISI
-# $Id: AdvancedWeb.pm,v 1.4 2001/07/05 14:15:39 mthurn Exp $
+# $Id: AdvancedWeb.pm,v 1.5 2001/11/30 22:03:26 mthurn Exp $
 #############################################################
 
 
@@ -96,6 +96,8 @@ MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 
 =head1 VERSION HISTORY
 
+2.06 - do not use URI::URL
+
 2.02 - Added HELP POD. Misc. Clean-up for latest changes.
 
 2.01 - Additional query modifiers added for even better results.
@@ -113,7 +115,7 @@ require Exporter;
 @EXPORT = qw();
 @EXPORT_OK = qw();
 @ISA = qw(WWW::Search::AltaVista Exporter);
-$VERSION = '2.05';
+$VERSION = '2.06';
 use WWW::Search::AltaVista;
 use WWW::Search(generic_option);
 
@@ -271,9 +273,8 @@ sub native_retrieve_some {
         my($relative_url) = $1;
         # hack:  make sure fmt=d stays on news URLs
         $relative_url =~ s/what=news/what=news\&fmt=d/ if ($relative_url !~ /fmt=d/i);
-            my($n) = new URI::URL($relative_url, $self->{_base_url});
-            $n = $n->abs;
-            $self->{_next_url} = $n;        $state = $POST_NEXT;
+        $self->{_next_url} = $HTTP::URI_CLASS->new_abs($relative_url, $self->{_base_url});
+        $state = $POST_NEXT;
         print STDERR "PARSE(15:->POST_NEXT): found next, $n.\n" if ($self->{_debug} >= 2);
     } else {
         # accumulate raw
