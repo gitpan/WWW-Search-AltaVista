@@ -13,12 +13,16 @@ my $iDebug = 0;
 my $iDump = 0;
 # These tests return no results (but we should not get an HTTP error):
 &my_test(0, $WWW::Search::Test::bogus_query, 0, 0, $iDebug);
-# &my_test("+LSAM +$WWW::Search::Test::bogus_query", 0, 0, $iDebug);
+DEBUG_NOW:
+$iDebug = 2;
+$iDump = 1;
+# &my_test(0, 'virus protease', undef, 55, $iDebug, $iDump);
+# exit 99;
 $iDebug = 0;
 $iDump = 0;
 &my_test(0, '"Rhon'.'da Thurn"', undef, 49, $iDebug, $iDump);
 my @ao = $WWW::Search::Test::oSearch->results();
-cmp_ok(0, '<=', scalar(@ao), 'got any results');
+cmp_ok(0, '<', scalar(@ao), 'got any results');
 foreach my $oResult (@ao)
   {
   like($oResult->url, qr{\Ahttp://},
@@ -28,8 +32,8 @@ foreach my $oResult (@ao)
   cmp_ok($oResult->description, 'ne', '',
          'result description is not empty');
   } # foreach
-DEBUG_NOW:
-# $iDebug = 2;
+$iDebug = 0;
+$iDump = 0;
 &my_test(0, 'Martin '.'Thurn', 51, undef, $iDebug);
 cmp_ok(51, '<=', $WWW::Search::Test::oSearch->approximate_hit_count,
        'approximate_hit_count');

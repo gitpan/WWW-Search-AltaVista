@@ -2,11 +2,12 @@
 use inc::Module::Install;
 
 name('WWW-Search-AltaVista');
-version(2.13);
+version(2.14);
 
 author('Martin Thurn <mthurn@cpan.org>');
 license('perl');
 
+requires( perl => 5.004 );
 requires('Date::Manip');
 requires('HTML::TreeBuilder');
 requires('WWW::Search');

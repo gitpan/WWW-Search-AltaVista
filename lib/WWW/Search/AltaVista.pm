@@ -1,7 +1,7 @@
 # AltaVista.pm
 # by John Heidemann
 # Copyright (C) 1996-1998 by USC/ISI
-# $Id: AltaVista.pm,v 2.30 2003-11-24 21:08:27-05 kingpin Exp kingpin $
+# $Id: AltaVista.pm,v 2.34 2004/02/07 01:03:49 Daddy Exp $
 #
 # Complete copyright notice follows below.
 
@@ -135,26 +135,21 @@ MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 package WWW::Search::AltaVista;
 
 use Carp ();
+use Date::Manip;
 use Exporter;
 use WWW::Search qw( generic_option strip_tags unescape_query );
 use WWW::Search::Result;
 
 use strict;
-
-use vars qw( @ISA @EXPORT @EXPORT_OK $VERSION $MAINTAINER );
-
-@EXPORT = qw();
-@EXPORT_OK = qw();
-@ISA = qw(WWW::Search Exporter);
+use vars qw( @ISA $VERSION $MAINTAINER );
+@ISA = qw( WWW::Search Exporter );
 $MAINTAINER = 'Martin Thurn <mthurn@cpan.org>';
-$VERSION = sprintf("%d.%02d", q$Revision: 2.30 $ =~ /(\d+)\.(\d+)/o);
-
+$VERSION = do { my @r = (q$Revision: 2.34 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r };
 
 sub undef_to_emptystring
   {
   return defined($_[0]) ? $_[0] : "";
-  }
-
+  } # undef_to_emptystring
 
 sub gui_query
   {
@@ -169,8 +164,6 @@ sub gui_query
   return $self->native_query($sQuery, $rh);
   } # gui_query
 
-
-# private
 sub native_setup_search
   {
   my ($self, $native_query, $native_options_ref) = @_;
@@ -232,7 +225,12 @@ sub native_setup_search
   $self->{_debug} = 2 if ($options_ref->{'search_parse_debug'});
   $self->{_debug} = 0 if (!defined($self->{_debug}));
   # Pattern for matching result-count in many languages:
-  $self->{'_qr_count'} = qr{\s(?:found|fand).+?([\d.,]+)\s+(result|headline|Ergebnisse)};
+  $self->{'_qr_count'} = qr{\b(?:found|fand)
+                            \s+
+                            ([0-9.,]+)
+                            \s+
+                            (?:result|headline|Ergebnisse)
+                            }x;
 
   # Finally figure out the url.
   $self->{_base_url} =
@@ -241,45 +239,38 @@ sub native_setup_search
   # print STDERR $self->{_base_url} . "\n" if ($self->{_debug});
   } # native_setup_search
 
-
-sub preprocess_results_page_DEBUG
+sub preprocess_results_page_OFF
   {
   my $self = shift;
   my $sPage = shift;
   # return $sPage;
   # For debugging only.  Print the page contents and abort.
-  print STDERR $sPage;
+  print STDERR '='x 25, "\n\n", $sPage, "\n\n", '='x 25;
   exit 88;
   } # preprocess_results_page
 
-
-# private
-sub save_old_hit {
-    my($self) = shift;
-    my($old_hit) = shift;
-    my($old_raw) = shift;
-
-    if (defined($old_hit)) {
+sub save_old_hit
+  {
+  my $self = shift;
+  my $old_hit = shift;
+  my $old_raw = shift;
+  if (defined($old_hit))
+    {
     $old_hit->raw($old_raw) if (defined($old_raw));
     push(@{$self->{cache}}, $old_hit);
-    };
+    }
+  return (undef, undef);
+  } # save_old_hit
 
-    return(undef, undef);
-}
-
-# private
 sub begin_new_hit
-{
-    my($self) = shift;
-    my($old_hit) = shift;
-    my($old_raw) = shift;
-
-    $self->save_old_hit($old_hit, $old_raw);
-
-    # Make a new hit.
-    return (new WWW::SearchResult, '');
-}
-
+  {
+  my($self) = shift;
+  my($old_hit) = shift;
+  my($old_raw) = shift;
+  $self->save_old_hit($old_hit, $old_raw);
+  # Make a new hit.
+  return (new WWW::SearchResult, '');
+  } # begin_new_hit
 
 sub parse_tree
   {
@@ -308,6 +299,7 @@ sub parse_tree
     my @aoDIV = $tree->look_down('_tag' => 'div',
                                   'class' => 'xs',
                                  );
+    my $qrCount = $self->{'_qr_count'};
  DIV_TAG:
     foreach my $oDIV (@aoDIV)
       {
@@ -315,42 +307,58 @@ sub parse_tree
       print STDERR " + try DIV ==", $oDIV->as_HTML if 2 <= $self->{_debug};
       my $s = $oDIV->as_text;
       print STDERR " +   TEXT ==$s==\n" if 2 <= $self->{_debug};
-      if ($s =~ m!$self->{_qr_count}!i)
+      if ($s =~ m!$qrCount!i)
         {
-        my $iCount = $1;
+        my $iCount = $1 || '';
         $iCount =~ tr!.,!!d;
         $self->approximate_result_count($iCount);
         last DIV_TAG;
         } # if
       } # foreach DIV_TAG
     } # if
-  print STDERR " + found approx_h_c is ==", $self->approximate_hit_count(), "==\n" if 2 <= $self->{_debug};
+  print STDERR " + found approx_h_c is ==", $self->approximate_hit_count(), "==\n" if (2 <= $self->{_debug});
   # Get the hits:
-  my @aoA = $tree->look_down('_tag' => 'a',
+  my @aoA = $tree->look_down(
+                             '_tag' => 'a',
                              'class' => 'res',
                             );
  A_TAG:
   foreach my $oA (@aoA)
     {
+    # <a class="res" href="/r?ck_sm=4bf6b336&amp;ci=4939&amp;av_tc=null&amp;q=%7Cvirus+%7Cprotease&amp;rpos=1&amp;rpge=1&amp;rsrc=U&amp;ref=200020080&amp;uid=1da8cd3e47b05cd0&amp;r=http%3A%2F%2Fwww.mcafee.com%2F" onmouseout="status=''; return true;" onmouseover="status='http://www.mcafee.com/'; return true;">McAfee Security - Computer Virus Software and Internet Security For Your PC</a>
     next unless ref $oA;
+    my $sA = $oA->as_HTML;
+    my $sURL = $1 if ($sA =~ m!onmouseover="status='(.+?)';!);
+    print STDERR " +   found A==$sA==\n" if (2 <= $self->{_debug});
     my $sTitle = $oA->as_text;
     my $oSPAN = $oA;
-    do
+ FIND_SPAN:
+    while (1)
       {
+      last FIND_SPAN if ! ref $oSPAN;
+      last FIND_SPAN if ($oSPAN->tag eq 'span');
       $oSPAN = $oSPAN->right;
-      last if ! ref $oSPAN;
-      } until ($oSPAN->tag eq 'span');
+      } # while
     if (ref $oSPAN)
       {
+      # $oSPAN now is <span class=s> which contains the description
+      # and the URL:
+      print STDERR " +     found SPAN==", $oSPAN->as_HTML, "==\n" if (2 <= $self->{_debug});
       my $oSPANurl = $oSPAN->look_down(
                                        '_tag' => 'span',
                                        'class' => 'ngrn',
                                       );
       if (ref $oSPANurl)
         {
+        # $oSPANurl is <span class=ngrn> which contains the URL
+        # (without http:// in front of it):
+        print STDERR " +     found SPANurl==", $oSPANurl->as_HTML, "==\n" if (2 <= $self->{_debug});
+        $sURL ||= $self->absurl($self->{'_prev_url'},
+                                $oSPANurl->as_text);
+        print STDERR " +     the URL   is ==$sURL==\n" if (2 <= $self->{_debug});
+        print STDERR " +     the title is ==$sTitle==\n" if (2 <= $self->{_debug});
         my $oHit = new WWW::Search::Result;
-        $oHit->add_url($self->absurl($self->{'_prev_url'},
-                                     $oSPANurl->as_text));
+        $oHit->add_url($sURL);
         $oSPANurl->detach;
         $oSPANurl->delete;
         $oHit->title($sTitle);
@@ -379,169 +387,6 @@ sub parse_tree
     } # foreach
   return $iHits;
   } # parse_tree
-
-# private
-sub native_retrieve_some_OLD
-{
-    my ($self) = @_;
-
-    # fast exit if already done
-    return undef if (!defined($self->{_next_url}));
-
-    # get some
-    print STDERR "WWW::Search::AltaVista::native_retrieve_some: fetching " . $self->{_next_url} . "\n" if ($self->{_debug});
-    my($response) = $self->http_request('GET', $self->{_next_url});
-    $self->{response} = $response;
-    if (! $response->is_success)
-      {
-      print STDERR " +   failed: ", $response->as_string if ($self->{_debug});
-      return undef;
-      } # if
-
-    print STDERR $response->content;
-    exit 88;
-
-    # parse the output
-    my ($HEADER, $HITS, $INHIT, $TRAILER, $POST_NEXT) = (1..10);  # order matters
-    my $hits_found = 0;
-    my $state = $HEADER;
-    my $hit = undef;
-    my $raw = '';
-    foreach ($self->split_lines($response->content()))
-      {
-      next if m/^$/; # short circuit for blank lines
-      print STDERR "PARSE(0:RAW): $_\n" if ($self->{_debug} >= 3);
-
-      ######
-      # HEADER PARSING: find the number of hits
-      #
-      if ($state == $HEADER && /(?:AltaVista|We)\s+(?:found|fand).*?([\d,]+)\s+(results?|headlines?|Ergebnisse)/i)
-        {
-        # Modified by Jim
-        my $n = $1;
-        $n =~ s/[.,]//g;
-        $self->approximate_result_count($n);
-        print STDERR "PARSE(10:HEADER->HITS): $n documents found.\n" if ($self->{_debug} >= 2);
-        return 0 unless (0 < $n);
-        $state = $HITS;
-        }
-
-        ######
-        # HITS PARSING: find each hit
-        #
-      elsif ($state == $HITS && /r=(.*?)"\s.*?">(.*)<\/a>/i)
-        {
-        $raw .= $_;
-        my ($url, $title) = (unescape_query($1), $2);
-        print STDERR "PARSE(13:INHIT): url+title: $title.\n" if ($self->{_debug} >= 2);
-        if ($title !~ m!\A<img!i)
-          {
-          ($hit, $raw) = $self->begin_new_hit($hit, $raw);
-          $hits_found++;
-          $hit->add_url($url);
-          $hit->title($title);
-          } # if
-        }
-      elsif ($state == $HITS && /^URL:\s(.*)$/i)
-        {
-        $raw .= $_;
-        print STDERR "PARSE(13:INHIT): url: $1.\n" if ($self->{_debug} >= 2);
-        }
-
-      if (0 && $state == $HITS && /^<br>/i)
-        {
-        }
-
-      if (($state == $HITS) &&
-          (m/^([\d|\w|<b>|\.].+?)<br>/i ||
-           m!<span\s+class=s>(.+?)<br>!i))
-        {
-        # We are looking at a description...
-        if (ref $hit)
-          {
-          # AND we have already seen a URL.
-          $raw .= $_;
-          $hit->description(&strip_tags($1));
-          } # if
-        print STDERR "PARSE(13:INHIT): description.\n" if ($self->{_debug} >= 2);
-        }
-      # Look for end of hits list:
-      if (($state == $HITS)
-          &&
-          (
-           /^<!-- res_extend.wm -->/i
-           ||
-           m!<a\s+href="/r\?ext24"!i
-           ||
-           m!<a\s+href="http://jump.altavista.com/rlweb_ebay.go!i
-          )
-         )
-        {
-        ($hit, $raw) = $self->save_old_hit($hit, $raw);
-        $state = $TRAILER;
-        print STDERR "PARSE(13:INHIT->HITS): end hit.\n" if ($self->{_debug} >= 2);
-        }
-      if ($hits_found &&
-          (($state == $TRAILER)
-           ||
-           ($state == $HITS))
-          &&
-          m/<a[^>]+href="([^"]+)"[^>]*>[^>]+&gt;&gt;/i)
-        {
-        # (above, note the trick $hits_found so we don't prematurely terminate.)
-        # set up next page
-        my $relative_url = $1;
-        # Actual line of input:
-        # &nbsp; <a href="/cgi-bin/query?pg=q&amp;nbq=50&amp;what=web&amp;text=yes&amp;fmt=d&amp;q=Martin+Thurn&stq=50" target="_self">[Next &gt;&gt;]</a>
-
-        print STDERR "PARSE(15:->POST_NEXT): raw next_url is $relative_url\n" if ($self->{_debug} >= 2);
-        # hack:  make sure fmt=d stays on news URLs
-        $relative_url =~ s/what=news/what=news\&fmt=d/ if ($relative_url !~ /fmt=d/i);
-        # Not sure why this is necessary.  BUT I *have* seen
-        # altavista.com spit out double-encoded URLs!  I.e. they
-        # contain &amp;amp; !!
-        $relative_url =~ s!&amp;!&!g;
-        my $sURLtry = $self->absurl($self->{_base_url}, $relative_url);
-        printf(STDERR "PARSE(15:->POST_NEXT): cooked next_url is $sURLtry.\n") if ($self->{_debug} >= 2);
-        if ($sURLtry =~ m!$self->{_options}->{search_host}$self->{_options}->{search_path}!)
-          {
-          # This really is the next URL.
-          $self->{_next_url} = $sURLtry;
-          $state = $POST_NEXT;
-          } # if
-        } # if
-
-      if (0 && ($state == $HITS))
-        {
-        # other random stuff in a hit---accumulate it
-        $raw .= $_;
-        print STDERR "PARSE(14:INHIT): no match.\n" if ($self->{_debug} >= 2);
-        print STDERR ' 'x 12, "$_\n" if ($self->{_debug} >= 3);
-        }
-      else
-        {
-        # accumulate raw
-        $raw .= $_;
-        # print STDERR "PARSE(RAW): $_\n" if ($self->{_debug} >= 3);
-        }
-      }
-
-    if ($state != $POST_NEXT)
-      {
-      # end, no other pages (missed ``next'' tag)
-      if ($state == $HITS)
-        {
-        $self->begin_new_hit($hit, $raw);   # save old one
-        print STDERR "PARSE: never got to TRAILER.\n" if ($self->{_debug} >= 2);
-        }
-      $self->{_next_url} = undef;
-      }
-
-    # sleep so as to not overload altavista
-    $self->user_agent_delay if (defined($self->{_next_url}));
-
-    return $hits_found;
-    } # native_retrieve_some
 
 1;
 

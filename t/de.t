@@ -35,7 +35,7 @@ foreach my $oResult (@ao)
 DEBUG_NOW:
 # The following query returns many pages of results:
 $debug = 0;
-&my_test(0, 'Thurn', 101, undef, $debug);
+&my_test(0, 'Berlin', 101, undef, $debug);
 cmp_ok(101, '<=', $WWW::Search::Test::oSearch->approximate_hit_count,
        'approximate_hit_count');
 # all done
