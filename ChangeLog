@@ -1,3 +1,7 @@
+2001-12-11  Kingpin  <mthurn@copper.dulles.tasc.com>
+
+	* lib/WWW/Search/AltaVista.pm (native_retrieve_some): unescape URL
+
 2001-11-30  Kingpin  <mthurn@copper.dulles.tasc.com>
 
 	* lib/WWW/Search/AltaVista/Intranet3.pm: new backend supplied by Peter von Burg

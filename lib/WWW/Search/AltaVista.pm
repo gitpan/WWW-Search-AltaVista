@@ -1,7 +1,7 @@
 # AltaVista.pm
 # by John Heidemann
 # Copyright (C) 1996-1998 by USC/ISI
-# $Id: AltaVista.pm,v 1.5 2001/11/30 22:04:08 mthurn Exp $
+# $Id: AltaVista.pm,v 1.6 2001/12/11 19:51:03 mthurn Exp $
 #
 # Complete copyright notice follows below.
 
@@ -105,10 +105,10 @@ require Exporter;
 @EXPORT = qw();
 @EXPORT_OK = qw();
 @ISA = qw(WWW::Search Exporter);
-$VERSION = '2.23';
+$VERSION = '2.24';
 
 use Carp ();
-use WWW::Search(generic_option);
+use WWW::Search qw( generic_option unescape_query );
 require WWW::SearchResult;
 
 
@@ -247,12 +247,12 @@ sub native_retrieve_some
       elsif ($state == $HITS && /r=(.*?)"\s.*?">(.*)<\/a>/i)
         {
         $raw .= $_;
-        my($url,$title) = ($1,$2);
+        my ($url, $title) = (unescape_query($1), $2);
         ($hit, $raw) = $self->begin_new_hit($hit, $raw);
         $hits_found++;
         $hit->add_url($url);
         $hit->title($title);
-        print STDERR "PARSE(13:INHIT): title: $1.\n" if ($self->{_debug} >= 2);
+        print STDERR "PARSE(13:INHIT): url+title: $title.\n" if ($self->{_debug} >= 2);
     } elsif ($state == $HITS && /^<br>/i) {
     } elsif ($state == $HITS && /^([\d|\w|<b>|\.].+)<br>/i)
       {
