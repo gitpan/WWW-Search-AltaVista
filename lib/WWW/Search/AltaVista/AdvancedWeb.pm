@@ -2,7 +2,7 @@
 # AdvancedWeb.pm
 # by Jim Smyser
 # Copyright (c) 1999 by Jim Smyser & USC/ISI
-# $Id: AdvancedWeb.pm,v 1.5 2001/11/30 22:03:26 mthurn Exp mthurn $
+# $Id: AdvancedWeb.pm,v 1.6 2002/02/19 15:52:27 mthurn Exp $
 #############################################################
 
 
@@ -96,6 +96,8 @@ MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 
 =head1 VERSION HISTORY
 
+2.07 - unescape URLs, and bugfix for undefined $hit
+
 2.06 - do not use URI::URL
 
 2.02 - Added HELP POD. Misc. Clean-up for latest changes.
@@ -115,7 +117,7 @@ require Exporter;
 @EXPORT = qw();
 @EXPORT_OK = qw();
 @ISA = qw(WWW::Search::AltaVista Exporter);
-$VERSION = '2.06';
+$VERSION = '2.07';
 use WWW::Search::AltaVista;
 use WWW::Search(generic_option);
 

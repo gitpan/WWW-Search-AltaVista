@@ -1,7 +1,7 @@
 # AltaVista.pm
 # by John Heidemann
 # Copyright (C) 1996-1998 by USC/ISI
-# $Id: AltaVista.pm,v 1.6 2001/12/11 19:51:03 mthurn Exp $
+# $Id: AltaVista.pm,v 1.6 2001/12/11 19:51:03 mthurn Exp mthurn $
 #
 # Complete copyright notice follows below.
 
@@ -105,7 +105,7 @@ require Exporter;
 @EXPORT = qw();
 @EXPORT_OK = qw();
 @ISA = qw(WWW::Search Exporter);
-$VERSION = '2.24';
+$VERSION = '2.25';
 
 use Carp ();
 use WWW::Search qw( generic_option unescape_query );
@@ -232,7 +232,7 @@ sub native_retrieve_some
       #
       print STDERR "PARSE(0:RAW): $_\n" if ($self->{_debug} >= 3);
       if (0) { }
-      elsif ($state == $HEADER && /We found.*?([\d,]+) (results|headlines):/i)
+      elsif ($state == $HEADER && /We found.*?([\d,]+) (results?|headlines?):/i)
         {
         # Modified by Jim
         my($n) = $1;

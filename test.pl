@@ -31,7 +31,7 @@ my $debug = 0;
 &run_test($WWW::Search::Test::bogus_query, 0, 0, $debug);
 &run_test("+LSAM +$WWW::Search::Test::bogus_query", 0, 0, $debug);
 &run_test('+LS'.'AM +IS'.'I +Heide'.'mann +Aut'.'oSearch', 1, 9, $debug);
-&run_test('+LS'.'AM +Aut'.'oSearch', 11, 19, $debug);
+&run_test('+Thu'.'rn +Ga'.'loob', 11, 19, $debug);
 &run_test('Ma'.'rtin', 21, undef, $debug);
 SKIP_BASIC:
 
@@ -41,8 +41,7 @@ my $debug = 0;
 # These tests return no results (but we should not get an HTTP error):
 &run_test($WWW::Search::Test::bogus_query, 0, 0, $debug);
 &run_test('+LS'.'AM +IS'.'I +Heide'.'mann +Aut'.'oSearch', 1, 9, $debug);
-# &run_test('+LSA'.'M +IS'.'I +I'.'B', 11, 19, $debug);
-&run_test('+LS'.'AM +Aut'.'oSearch', 11, 19, $debug);
+&run_test('+Thu'.'rn +Ga'.'loob', 11, 19, $debug);
 &run_test('Ma'.'rtin', 21, undef, $debug);
 SKIP_WEB:
 
