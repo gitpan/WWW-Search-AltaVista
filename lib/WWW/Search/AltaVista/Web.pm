@@ -20,6 +20,9 @@ package WWW::Search::AltaVista::Web;
 use WWW::Search::AltaVista;
 @ISA = qw(WWW::Search::AltaVista);
 
+my
+$VERSION = do { my @r = (q$Revision: 1.3 $ =~ /\d+/g); sprintf "%d."."%03d" x $#r, @r };
+
 1;
 
 __END__

@@ -2,7 +2,7 @@
 # AdvancedWeb.pm
 # by Jim Smyser
 # Copyright (c) 1999 by Jim Smyser & USC/ISI
-# $Id: AdvancedWeb.pm,v 1.7 2002/08/20 18:27:27 mthurn Exp $
+# $Id: AdvancedWeb.pm,v 1.301 2004/02/24 13:48:02 Daddy Exp $
 #############################################################
 
 
@@ -116,12 +116,11 @@ MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 require Exporter;
 @EXPORT = qw();
 @EXPORT_OK = qw();
-@ISA = qw(WWW::Search::AltaVista Exporter);
-$VERSION = '2.08';
+@ISA = qw( WWW::Search::AltaVista Exporter );
+my
+$VERSION = do { my @r = (q$Revision: 1.301 $ =~ /\d+/g); sprintf "%d."."%03d" x $#r, @r };
+use WWW::Search (generic_option);
 use WWW::Search::AltaVista;
-use WWW::Search(generic_option);
-
-
 
 # private
 sub native_setup_search
@@ -168,10 +167,10 @@ sub native_setup_search
     # Here I remove known Boolean operators from the 'r' query option 
     # which is used by AltaVista to sort the results. Finally, clean 
     # up by removing as many of the double ++'s as possibe left behind.
-    $native_query =~ s/AND//ig;
-    $native_query =~ s/OR//ig;
-    $native_query =~ s/NOT//ig;
-    $native_query =~ s/NEAR//ig;
+    $native_query =~ s/\bAND\b//ig;
+    $native_query =~ s/\bOR\b//ig;
+    $native_query =~ s/\bNOT\b//ig;
+    $native_query =~ s/\bNEAR\b//ig;
     $native_query =~ s/"//g;
     $native_query =~ s/%28//g;
     $native_query =~ s/%29//g;
@@ -183,7 +182,7 @@ sub native_setup_search
     $self->{_options}{'search_url'} .
     "?" . $options .
     "r=" . $native_query;
-    }
+    } # native_setup_search
 
 # All other methods are inherited from WWW::Search::AltaVista
 

@@ -1,3 +1,11 @@
+2004-02-24  Kingpin  <mthurn@verizon.net>
+
+	* lib/WWW/Search/AltaVista/News.pm (parse_tree): use count_pattern()
+
+	* lib/WWW/Search/AltaVista.pm (count_pattern): new method
+
+	* lib/WWW/Search/AltaVista/Web.pm: add $VERSION
+
 2004-02-06  Kingpin  <mthurn@verizon.net>
 
 	* lib/WWW/Search/AltaVista.pm (parse_tree): fixed undef error(s)

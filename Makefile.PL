@@ -2,7 +2,7 @@
 use inc::Module::Install;
 
 name('WWW-Search-AltaVista');
-version(2.14);
+version(2.141);
 
 author('Martin Thurn <mthurn@cpan.org>');
 license('perl');

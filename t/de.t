@@ -12,15 +12,13 @@ BEGIN { use_ok('WWW::Search::AltaVista::DE') };
 # goto DEBUG_NOW;
 
 my $debug = 0;
+diag("Sending 0-page query...");
 # These tests return no results (but we should not get an HTTP error):
 &my_test(0, $WWW::Search::Test::bogus_query, 0, 0, $debug);
+diag("Sending 1-page query...");
 # The following query returns one page of results:
 $debug = 0;
 &my_test(0, '"Martin Thurn-Mit'.'hoff"', 1, 49, $debug);
-cmp_ok(1, '<=', $WWW::Search::Test::oSearch->approximate_hit_count,
-       'approximate_hit_count');
-cmp_ok($WWW::Search::Test::oSearch->approximate_hit_count, '<=', 49,
-       'approximate_hit_count');
 my @ao = $WWW::Search::Test::oSearch->results();
 cmp_ok(0, '<=', scalar(@ao), 'got any results');
 foreach my $oResult (@ao)
@@ -33,11 +31,10 @@ foreach my $oResult (@ao)
          'result description is not empty');
   } # foreach
 DEBUG_NOW:
+diag("Sending multi-page query...");
 # The following query returns many pages of results:
 $debug = 0;
 &my_test(0, 'Berlin', 101, undef, $debug);
-cmp_ok(101, '<=', $WWW::Search::Test::oSearch->approximate_hit_count,
-       'approximate_hit_count');
 # all done
 exit 0;
 
@@ -56,6 +53,10 @@ sub my_test
   my $iCount = &WWW::Search::Test::count_results(@_);
   cmp_ok($iMin, '<=', $iCount, qq{lower-bound num-hits for query=$sQuery}) if defined $iMin;
   cmp_ok($iCount, '<=', $iMax, qq{upper-bound num-hits for query=$sQuery}) if defined $iMax;
+  cmp_ok($iMin, '<=', $WWW::Search::Test::oSearch->approximate_result_count,
+         qq{lower-bound approximate_result_count}) if defined $iMin;
+  cmp_ok($WWW::Search::Test::oSearch->approximate_result_count, '<=', $iMax,
+         qq{upper-bound approximate_result_count}) if defined $iMax;
   } # my_test
 
 __END__

@@ -1,7 +1,7 @@
 # News.pm
 # by John Heidemann
 # Copyright (C) 1996 by USC/ISI
-# $Id: News.pm,v 1.6 2003-11-24 21:07:58-05 kingpin Exp kingpin $
+# $Id: News.pm,v 2.1 2004/02/24 13:46:46 Daddy Exp $
 #
 # Complete copyright notice follows below.
 
@@ -69,21 +69,22 @@ use vars qw( @EXPORT @EXPORT_OK @ISA $MAINTAINER $VERSION );
 @EXPORT_OK = qw();
 @ISA = qw(WWW::Search::AltaVista Exporter);
 $MAINTAINER = 'Martin Thurn <mthurn@cpan.org>';
-$VERSION = sprintf("%d.%02d", q$Revision: 1.6 $ =~ /(\d+)\.(\d+)/o);
+$VERSION = sprintf("%d.%03d", q$Revision: 2.1 $ =~ /(\d+)\.(\d+)/o);
 
 # private
 sub native_setup_search
   {
   my $self = shift;
   my $sQuery = shift;
-  if (!defined($self->{_options})) {
+  if (!defined($self->{_options}))
+    {
     $self->{_options} = {
                          'nbq' => '50',
                          'q' => $sQuery,
                          'search_host' => 'http://news.altavista.com',
                          'search_path' => '/news/search',
                         };
-    };
+    } # if
   # If I use 'US/Eastern', Date::Manip gives undef warnings:
   &Date_Init('TZ=-0500');
   # Let AltaVista.pm finish up the hard work:
@@ -100,6 +101,7 @@ sub parse_tree
   print STDERR " + start, approx_h_c is ==", $self->approximate_hit_count(), "==\n" if 2 <= $self->{_debug};
   if ($self->approximate_hit_count() < 1)
     {
+    my $qrCount = $self->count_pattern;
     # The hit count is inside a <B> tag:
     my @aoB = $tree->look_down('_tag' => 'b',
                                'class' => 'lbl',
@@ -111,7 +113,7 @@ sub parse_tree
       print STDERR " + try B ==", $oB->as_HTML if 2 <= $self->{_debug};
       my $s = $oB->as_text;
       print STDERR " +   TEXT ==$s==\n" if 2 <= $self->{_debug};
-      if ($s =~ m!$self->{_qr_count}!i)
+      if ($s =~ m!$qrCount!i)
         {
         my $iCount = $1;
         $iCount =~ s!,!!g;

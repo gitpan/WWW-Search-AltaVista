@@ -1,7 +1,7 @@
 # AltaVista.pm
 # by John Heidemann
 # Copyright (C) 1996-1998 by USC/ISI
-# $Id: AltaVista.pm,v 2.34 2004/02/07 01:03:49 Daddy Exp $
+# $Id: AltaVista.pm,v 2.351 2004/02/24 13:49:51 Daddy Exp $
 #
 # Complete copyright notice follows below.
 
@@ -136,7 +136,7 @@ package WWW::Search::AltaVista;
 
 use Carp ();
 use Date::Manip;
-use Exporter;
+# use Exporter;
 use WWW::Search qw( generic_option strip_tags unescape_query );
 use WWW::Search::Result;
 
@@ -144,7 +144,7 @@ use strict;
 use vars qw( @ISA $VERSION $MAINTAINER );
 @ISA = qw( WWW::Search Exporter );
 $MAINTAINER = 'Martin Thurn <mthurn@cpan.org>';
-$VERSION = do { my @r = (q$Revision: 2.34 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r };
+$VERSION = do { my @r = (q$Revision: 2.351 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r };
 
 sub undef_to_emptystring
   {
@@ -224,13 +224,6 @@ sub native_setup_search
   $self->{_debug} = $options_ref->{'search_debug'};
   $self->{_debug} = 2 if ($options_ref->{'search_parse_debug'});
   $self->{_debug} = 0 if (!defined($self->{_debug}));
-  # Pattern for matching result-count in many languages:
-  $self->{'_qr_count'} = qr{\b(?:found|fand)
-                            \s+
-                            ([0-9.,]+)
-                            \s+
-                            (?:result|headline|Ergebnisse)
-                            }x;
 
   # Finally figure out the url.
   $self->{_base_url} =
@@ -238,6 +231,20 @@ sub native_setup_search
   $self->{_options}{'search_host'} . $self->{_options}{'search_path'} .'?'. $options;
   # print STDERR $self->{_base_url} . "\n" if ($self->{_debug});
   } # native_setup_search
+
+sub count_pattern
+  {
+  # Pattern for matching result-count in many languages.
+  # Language-specific subclasses might need to override this.
+  return qr{\b(?:found|fand)
+            \s+
+            ([0-9.,]+)
+            \s+
+            # This covers English and German:
+            (?:result|headline|Ergebnisse)
+            }x;
+  } # count_pattern
+
 
 sub preprocess_results_page_OFF
   {
@@ -299,7 +306,7 @@ sub parse_tree
     my @aoDIV = $tree->look_down('_tag' => 'div',
                                   'class' => 'xs',
                                  );
-    my $qrCount = $self->{'_qr_count'};
+    my $qrCount = $self->count_pattern;
  DIV_TAG:
     foreach my $oDIV (@aoDIV)
       {
