@@ -1,16 +1,9 @@
-#!/usr/local/bin/perl -w
-
-#
 # News.pm
 # by John Heidemann
 # Copyright (C) 1996 by USC/ISI
-# $Id: News.pm,v 1.1 1999/06/18 19:16:18 mthurn Exp $
+# $Id: News.pm,v 1.3 2001/09/21 13:47:43 mthurn Exp $
 #
 # Complete copyright notice follows below.
-# 
-
-
-package WWW::Search::AltaVista::News;
 
 =head1 NAME
 
@@ -44,8 +37,8 @@ C<WWW::Search> is written by John Heidemann, <johnh@isi.edu>.
 =head1 COPYRIGHT
 
 Copyright (c) 1996 University of Southern California.
-All rights reserved.                                            
-                                                               
+All rights reserved.
+
 Redistribution and use in source and binary forms are permitted
 provided that the above copyright notice and this paragraph are
 duplicated in all such forms and that any documentation, advertising
@@ -67,6 +60,8 @@ MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 
 #####################################################################
 
+package WWW::Search::AltaVista::News;
+
 require Exporter;
 @EXPORT = qw();
 @EXPORT_OK = qw();
@@ -79,12 +74,12 @@ sub native_setup_search
     my($self) = shift;
     if (!defined($self->{_options})) {
 	$self->{_options} = {
-	    pg => 'q',
-	    'text' => 'yes',
-	    what => 'news',
-	    fmt => 'd',
-	    'search_url' => 'http://www.altavista.com/cgi-bin/query',
-        };
+                             pg => 'q',
+                             'text' => 'yes',
+                             # what => 'news',
+                             fmt => 'd',
+                             'search_url' => 'http://news.altavista.com/search',
+                            };
     };
     # let AltaVista.pm finish up the hard work.
     return $self->SUPER::native_setup_search(@_);

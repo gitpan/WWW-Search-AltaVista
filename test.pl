@@ -25,13 +25,17 @@ $WWW::Search::Test::iTest = 1;
 
 &new_engine('AltaVista');
 my $debug = 0;
+
+# goto SKIP_BASIC;
 # These tests return no results (but we should not get an HTTP error):
 &run_test($WWW::Search::Test::bogus_query, 0, 0, $debug);
 &run_test("+LSAM +$WWW::Search::Test::bogus_query", 0, 0, $debug);
 &run_test('+LS'.'AM +IS'.'I +Heide'.'mann +Aut'.'oSearch', 1, 9, $debug);
 &run_test('+LS'.'AM +Aut'.'oSearch', 11, 19, $debug);
 &run_test('Ma'.'rtin', 21, undef, $debug);
+SKIP_BASIC:
 
+# goto SKIP_WEB;
 &new_engine('AltaVista::Web');
 my $debug = 0;
 # These tests return no results (but we should not get an HTTP error):
@@ -40,6 +44,7 @@ my $debug = 0;
 # &run_test('+LSA'.'M +IS'.'I +I'.'B', 11, 19, $debug);
 &run_test('+LS'.'AM +Aut'.'oSearch', 11, 19, $debug);
 &run_test('Ma'.'rtin', 21, undef, $debug);
+SKIP_WEB:
 
 # goto SKIP_ADVANCEDWEB;
 &new_engine('AltaVista::AdvancedWeb');
@@ -56,14 +61,14 @@ SKIP_ADVANCEDWEB:
 
 # goto SKIP_NEWS;
 &new_engine('AltaVista::News');
-my $debug = 0;
+$debug = 0;
 # These tests return no results (but we should not get an HTTP error):
 &run_test($WWW::Search::Test::bogus_query, 0, 0, $debug);
 &run_test("+perl +$WWW::Search::Test::bogus_query", 0, 0, $debug);
 # This query returns 1 page of results:
 # This query returns 2 pages of results:
-&run_test('+Pe'.'rl +CP'.'AN', 31, undef, $debug);
-# This query returns 3 (or more) pages of results:
+$debug = 0;
+&run_test('li'.'nux', 31, undef, $debug);
 SKIP_NEWS:
 
 # goto SKIP_ADVANCEDNEWS;
@@ -75,7 +80,7 @@ my $debug = 0;
 # This query returns 1 page of results:
 # This query returns 2 pages of results:
 # This query returns 3 (or more) pages of results:
-&run_test('+Pe'.'rl +CP'.'AN', 61, undef, $debug);
+&run_test('li'.'nux', 61, undef, $debug);
 SKIP_ADVANCEDNEWS:
 
 

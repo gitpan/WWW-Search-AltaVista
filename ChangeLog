@@ -1,3 +1,8 @@
+2001-10-09  Kingpin  <mthurn@copper.dulles.tasc.com>
+
+	* lib/WWW/Search/AltaVista.pm (native_retrieve_some): BUGFIX for death when seeing (bogus) description without a URL
+	(native_retrieve_some): FIX for getting count of News results
+
 2001-07-05  Kingpin  <mthurn@tasc.com>
 
 	* FIRST RELEASE outside of the WWW::Search distribution

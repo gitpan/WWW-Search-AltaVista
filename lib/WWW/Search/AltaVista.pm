@@ -1,7 +1,7 @@
 # AltaVista.pm
 # by John Heidemann
 # Copyright (C) 1996-1998 by USC/ISI
-# $Id: AltaVista.pm,v 1.2 2001/07/05 12:47:54 mthurn Exp $
+# $Id: AltaVista.pm,v 1.4 2001/10/09 19:45:23 mthurn Exp $
 #
 # Complete copyright notice follows below.
 
@@ -105,7 +105,7 @@ require Exporter;
 @EXPORT = qw();
 @EXPORT_OK = qw();
 @ISA = qw(WWW::Search Exporter);
-$VERSION = '2.21';
+$VERSION = '2.22';
 
 use Carp ();
 use WWW::Search(generic_option);
@@ -204,9 +204,11 @@ sub native_retrieve_some
     print STDERR "WWW::Search::AltaVista::native_retrieve_some: fetching " . $self->{_next_url} . "\n" if ($self->{_debug});
     my($response) = $self->http_request('GET', $self->{_next_url});
     $self->{response} = $response;
-    if (!$response->is_success) {
-    return undef;
-    };
+    if (!$response->is_success)
+      {
+      print STDERR " +   failed: $response\n" if ($self->{_debug});
+      return undef;
+      } # if
 
     # parse the output
     my($HEADER, $HITS, $INHIT, $TRAILER, $POST_NEXT) = (1..10);  # order matters
@@ -214,23 +216,28 @@ sub native_retrieve_some
     my($state) = ($HEADER);
     my($hit) = undef;
     my($raw) = '';
-    foreach ($self->split_lines($response->content())) {
-        next if m@^$@; # short circuit for blank lines
-    ######
-    # HEADER PARSING: find the number of hits
-    #
-    if (0) {
-    } elsif ($state == $HEADER && /We found.*?([\d,]+) results:/i) {
+    foreach ($self->split_lines($response->content()))
+      {
+      next if m@^$@; # short circuit for blank lines
+      ######
+      # HEADER PARSING: find the number of hits
+      #
+      print STDERR "PARSE(0:RAW): $_\n" if ($self->{_debug} >= 3);
+      if (0) { }
+      elsif ($state == $HEADER && /We found.*?([\d,]+) (results|headlines):/i)
+        {
         # Modified by Jim
         my($n) = $1;
         $n =~ s/,//g;
         $self->approximate_result_count($n);
         $state = $HITS;
         print STDERR "PARSE(10:HEADER->HITS): $n documents found.\n" if ($self->{_debug} >= 2);
-    ######
-    # HITS PARSING: find each hit
-    #
-    } elsif ($state == $HITS && /r=(.*?)"\s.*?">(.*)<\/a>/i) {
+        ######
+        # HITS PARSING: find each hit
+        #
+        }
+      elsif ($state == $HITS && /r=(.*?)"\s.*?">(.*)<\/a>/i)
+        {
         $raw .= $_;
         my($url,$title) = ($1,$2);
         ($hit, $raw) = $self->begin_new_hit($hit, $raw);
@@ -239,11 +246,18 @@ sub native_retrieve_some
         $hit->title($title);
         print STDERR "PARSE(13:INHIT): title: $1.\n" if ($self->{_debug} >= 2);
     } elsif ($state == $HITS && /^<br>/i) {
-    } elsif ($state == $HITS && /^([\d|\w|<b>|\.].+)<br>/i) {
+    } elsif ($state == $HITS && /^([\d|\w|<b>|\.].+)<br>/i)
+      {
+      # We are looking at a description...
+      if (ref $hit)
+        {
+        # AND we have already seen a URL.
         $raw .= $_;
         $hit->description($1);
-        print STDERR "PARSE(13:INHIT): description.\n" if ($self->{_debug} >= 2);
-    } elsif ($state == $HITS && /^URL:\s(.*)$/i) { #"
+        } # if
+      print STDERR "PARSE(13:INHIT): description.\n" if ($self->{_debug} >= 2);
+      }
+    elsif ($state == $HITS && /^URL:\s(.*)$/i) { #"
         $raw .= $_;
         print STDERR "PARSE(13:INHIT): url: $1.\n" if ($self->{_debug} >= 2);
     } elsif ($state == $HITS && /^<!-- res_extend.wm -->/i) {
@@ -260,16 +274,20 @@ sub native_retrieve_some
         # (above, note the trick $hits_found so we don't prematurely terminate.)
         # set up next page
         my($relative_url) = $1;
+        print STDERR "PARSE(15:->POST_NEXT): raw next_url is $relative_url\n" if ($self->{_debug} >= 2);
         # hack:  make sure fmt=d stays on news URLs
         $relative_url =~ s/what=news/what=news\&fmt=d/ if ($relative_url !~ /fmt=d/i);
-            my($n) = new URI::URL($relative_url, $self->{_base_url});
-            $n = $n->abs;
-            $self->{_next_url} = $n;        $state = $POST_NEXT;
-        print STDERR "PARSE(15:->POST_NEXT): found next, $n.\n" if ($self->{_debug} >= 2);
+        # Not sure why this is necessary.  BUT I *have* seen altavista.com spit out double-encoded URLs!  I.e. they contain &amp;amp; !!
+        $relative_url =~ s!&amp;!&!g;
+        my $n = new URI::URL($relative_url, $self->{_base_url});
+        $n = $n->abs;
+        $self->{_next_url} = $n;
+        $state = $POST_NEXT;
+        print STDERR "PARSE(15:->POST_NEXT): cooked next_url is $n.\n" if ($self->{_debug} >= 2);
     } else {
         # accumulate raw
         $raw .= $_;
-        print STDERR "PARSE(RAW): $_\n" if ($self->{_debug} >= 3);
+        # print STDERR "PARSE(RAW): $_\n" if ($self->{_debug} >= 3);
     };
     };
     if ($state != $POST_NEXT) {
