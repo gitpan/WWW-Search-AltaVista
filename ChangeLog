@@ -1,3 +1,9 @@
+2003-07-27  Kingpin  <mthurn@megapipe.net>
+
+	* lib/WWW/Search/AltaVista/DE.pm: new backend (thanks to Dmitry Katsubo)
+
+	* lib/WWW/Search/AltaVista.pm (native_retrieve_some): tweak result-count patterns for www.altavista.de
+
 2003-03-30  Kingpin  <mthurn@megapipe.net>
 
 	* lib/WWW/Search/AltaVista/News.pm (native_setup_search): new search URL

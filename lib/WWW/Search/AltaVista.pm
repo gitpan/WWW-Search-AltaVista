@@ -1,7 +1,7 @@
 # AltaVista.pm
 # by John Heidemann
 # Copyright (C) 1996-1998 by USC/ISI
-# $Id: AltaVista.pm,v 2.28 2003-03-30 17:35:56-05 kingpin Exp kingpin $
+# $Id: AltaVista.pm,v 2.29 2003-07-27 21:23:08-04 kingpin Exp kingpin $
 #
 # Complete copyright notice follows below.
 
@@ -147,7 +147,7 @@ use vars qw( @ISA @EXPORT @EXPORT_OK $VERSION $MAINTAINER );
 @EXPORT_OK = qw();
 @ISA = qw(WWW::Search Exporter);
 $MAINTAINER = 'Martin Thurn <mthurn@cpan.org>';
-$VERSION = sprintf("%d.%02d", q$Revision: 2.28 $ =~ /(\d+)\.(\d+)/o);
+$VERSION = sprintf("%d.%02d", q$Revision: 2.29 $ =~ /(\d+)\.(\d+)/o);
 
 
 sub undef_to_emptystring
@@ -300,11 +300,11 @@ sub native_retrieve_some
       ######
       # HEADER PARSING: find the number of hits
       #
-      if ($state == $HEADER && /(?:AltaVista|We)\s+found.*?([\d,]+)\s+(results?|headlines?)/i)
+      if ($state == $HEADER && /(?:AltaVista|We)\s+(?:found|fand).*?([\d,]+)\s+(results?|headlines?|Ergebnisse)/i)
         {
         # Modified by Jim
         my $n = $1;
-        $n =~ s/,//g;
+        $n =~ s/[.,]//g;
         $self->approximate_result_count($n);
         print STDERR "PARSE(10:HEADER->HITS): $n documents found.\n" if ($self->{_debug} >= 2);
         return 0 unless (0 < $n);
