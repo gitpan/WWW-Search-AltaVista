@@ -22,7 +22,7 @@ DEBUG_NOW:
 diag("Sending multi-page normal query...");
 $iDebug = 0;
 $iDump = 0;
-&my_test(0, 'Japan', 31, undef, $iDebug, $iDump);
+&my_test(0, 'Ashburn', 51, undef, $iDebug, $iDump);
 my @ao = $WWW::Search::Test::oSearch->results();
 cmp_ok(0, '<=', scalar(@ao), 'got any results');
 foreach my $oResult (@ao)
@@ -71,7 +71,7 @@ sub my_test
   # Same arguments as WWW::Search::Test::count_results()
   my ($sType, $sQuery, $iMin, $iMax, $iDebug, $iPrintResults) = @_;
   my $iCount = &WWW::Search::Test::count_results(@_);
-  cmp_ok($iCount, '>=', $iMin, qq{lower-bound num-hits for query=$sQuery}) if defined $iMin;
+  cmp_ok($iMin, '<=', $iCount, qq{lower-bound num-hits for query=$sQuery}) if defined $iMin;
   cmp_ok($iCount, '<=', $iMax, qq{upper-bound num-hits for query=$sQuery}) if defined $iMax;
   cmp_ok($iMin, '<=', $WWW::Search::Test::oSearch->approximate_result_count,
          qq{lower-bound approximate_result_count}) if defined $iMin;

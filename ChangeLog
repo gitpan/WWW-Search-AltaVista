@@ -1,3 +1,9 @@
+2004-04-05  Kingpin  <mthurn@verizon.net>
+
+	* lib/WWW/Search/AltaVista/News.pm: handle new HTML page format
+
+	* lib/WWW/Search/AltaVista.pm: handle new HTML page format
+
 2004-02-24  Kingpin  <mthurn@verizon.net>
 
 	* lib/WWW/Search/AltaVista/News.pm (parse_tree): use count_pattern()

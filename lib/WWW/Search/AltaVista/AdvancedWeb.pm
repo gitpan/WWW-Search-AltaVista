@@ -2,7 +2,7 @@
 # AdvancedWeb.pm
 # by Jim Smyser
 # Copyright (c) 1999 by Jim Smyser & USC/ISI
-# $Id: AdvancedWeb.pm,v 1.301 2004/02/24 13:48:02 Daddy Exp $
+# $Id: AdvancedWeb.pm,v 2.81 2004/03/04 04:00:41 Daddy Exp $
 #############################################################
 
 
@@ -118,7 +118,7 @@ require Exporter;
 @EXPORT_OK = qw();
 @ISA = qw( WWW::Search::AltaVista Exporter );
 my
-$VERSION = do { my @r = (q$Revision: 1.301 $ =~ /\d+/g); sprintf "%d."."%03d" x $#r, @r };
+$VERSION = do { my @r = (q$Revision: 2.81 $ =~ /\d+/g); sprintf "%d."."%03d" x $#r, @r };
 use WWW::Search (generic_option);
 use WWW::Search::AltaVista;
 
@@ -130,10 +130,10 @@ sub native_setup_search
     $self->{_next_to_retrieve} = 0;
     # Upper case all lower case Boolean operators. Be nice if
     # I could just uppercase the entire string, but this may
-    # have undesirable search side effects. 
+    # have undesirable search side effects.
     if (!defined($self->{_options}))
       {
-      $self->{_options} = 
+      $self->{_options} =
         {
          'pg' => 'aq',
          'avkw' => 'tgz',

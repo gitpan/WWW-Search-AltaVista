@@ -1,7 +1,7 @@
 # News.pm
 # by John Heidemann
 # Copyright (C) 1996 by USC/ISI
-# $Id: News.pm,v 2.1 2004/02/24 13:46:46 Daddy Exp $
+# $Id: News.pm,v 2.102 2004/04/06 03:35:40 Daddy Exp $
 #
 # Complete copyright notice follows below.
 
@@ -58,7 +58,6 @@ MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 
 package WWW::Search::AltaVista::News;
 
-use Date::Manip;
 use Exporter;
 use WWW::Search::AltaVista;
 
@@ -69,7 +68,7 @@ use vars qw( @EXPORT @EXPORT_OK @ISA $MAINTAINER $VERSION );
 @EXPORT_OK = qw();
 @ISA = qw(WWW::Search::AltaVista Exporter);
 $MAINTAINER = 'Martin Thurn <mthurn@cpan.org>';
-$VERSION = sprintf("%d.%03d", q$Revision: 2.1 $ =~ /(\d+)\.(\d+)/o);
+$VERSION = do { my @r = (q$Revision: 2.102 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r };
 
 # private
 sub native_setup_search
@@ -78,18 +77,27 @@ sub native_setup_search
   my $sQuery = shift;
   if (!defined($self->{_options}))
     {
+    # http://www.altavista.com/news/results?q=Ashburn&nc=0&nr=0&nd=2
     $self->{_options} = {
                          'nbq' => '50',
                          'q' => $sQuery,
-                         'search_host' => 'http://news.altavista.com',
-                         'search_path' => '/news/search',
+                         'search_host' => 'http://www.altavista.com',
+                         'search_path' => '/news/results',
                         };
     } # if
-  # If I use 'US/Eastern', Date::Manip gives undef warnings:
-  &Date_Init('TZ=-0500');
   # Let AltaVista.pm finish up the hard work:
   return $self->SUPER::native_setup_search($sQuery, @_);
   } # native_setup_search
+
+sub preprocess_results_page_OFF
+  {
+  my $self = shift;
+  my $sPage = shift;
+  # return $sPage;
+  # For debugging only.  Print the page contents and abort.
+  print STDERR '='x 25, "\n\n", $sPage, "\n\n", '='x 25;
+  exit 88;
+  } # preprocess_results_page
 
 sub parse_tree
   {
@@ -125,67 +133,38 @@ sub parse_tree
   print STDERR " + found approx_h_c is ==", $self->approximate_hit_count(), "==\n" if 2 <= $self->{_debug};
   # Get the hits:
   my @aoA = $tree->look_down('_tag' => 'a',
+                             'class' => 'res',
                             );
  A_TAG:
   foreach my $oA (@aoA)
     {
-    next unless ref $oA;
-    my $sMouseover = $oA->attr('onMouseOver') || '';
-    next A_TAG if ($sMouseover eq '');
-    next A_TAG unless ($sMouseover =~ m!status='(.+?)';!);
-    my $sURL = $1;
+    next A_TAG unless ref $oA;
+    my $sURL = $oA->attr('href') || '';
+    next A_TAG unless ($sURL ne '');
     my $sTitle = $oA->as_text;
     print STDERR " + oA ==", $oA->as_HTML, "==\n" if (2 <= $self->{_debug});
     print STDERR " + sTitle ==$sTitle==\n" if (2 <= $self->{_debug});
-    my $oSPAN = $oA;
-    $oA->parent->objectify_text;
-    my $sDescription = '';
-    # print STDERR " +   start grabbing description...\n" if (2 <= $self->{_debug});
- SPAN:
-    while (1)
-      {
-      $oSPAN = $oSPAN->right;
-      last SPAN if ! defined($oSPAN);
-      # print STDERR " +     consider SPAN ==$oSPAN==\n" if (2 <= $self->{_debug});
-      # $oSPAN->dump(\*STDERR);
-      last SPAN if (ref($oSPAN) && ($oSPAN->tag eq 'span'));
-      if ($oSPAN->tag eq '~text')
-        {
-        $sDescription .= $oSPAN->attr('text');
-        }
-      else
-        {
-        $sDescription .= $oSPAN->as_text;
-        }
-      # print STDERR " +     desc is now ==$sDescription==\n" if (2 <= $self->{_debug});
-      } # while
-    $oA->parent->deobjectify_text;
-    next A_TAG unless (ref $oSPAN);
-    my $oSPANdate = $oSPAN->look_down(
-                                      '_tag' => 'span',
-                                      'class' => 'ngrn',
-                                     );
-    next A_TAG unless (ref $oSPANdate);
-    print STDERR " + oSPANdate ==", $oSPANdate->as_HTML, "==\n" if (2 <= $self->{_debug});
+    my $oTD = $oA->parent;
+    next A_TAG unless ref $oTD;
+
+    my $oSPANdate = $oTD->look_down('_tag' => 'span', 'class' => 'ngrn');
+    next A_TAG unless ref $oSPANdate;
     my $sDate = $oSPANdate->as_text;
-    print STDERR " +   raw     sDate ==$sDate==\n" if (2 <= $self->{_debug});
-    $sDate =~ s!\A\s*(?:Found|Fand)\s+!!i;
-    print STDERR " +   poached sDate ==$sDate==\n" if (2 <= $self->{_debug});
-    my $sErr;
-    my $sDate1 = &DateCalc('now', $sDate, \$sErr);
-    print STDERR " +   DateCalc result ==$sDate1==$sErr==\n" if (2 <= $self->{_debug});
-    my $sDate2 = &UnixDate($sDate1, '%Y-%m-%d %H:%M');
-    print STDERR " +   cooked  sDate ==$sDate2==\n" if (2 <= $self->{_debug});
-    $oSPANdate->detach;
-    $oSPANdate->delete;
+
+    my $oSPANsrc = $oTD->look_down('_tag' => 'span', 'style' => 'color:#4a4a4a');
+    next A_TAG unless ref $oSPANsrc;
+    my $sSource = $oSPANsrc->as_text;
+
+    my $oSPANdesc = $oTD->look_down('_tag' => 'span', 'class' => 's');
+    next A_TAG unless ref $oSPANdesc;
+    my $sDescription = $oSPANdesc->as_text;
 
     my $oHit = new WWW::Search::Result;
     $oHit->add_url($self->absurl($self->{'_prev_url'}, $sURL));
     $oHit->title(&WWW::Search::strip_tags($sTitle));
-    print STDERR " + oSPAN ==", $oSPAN->as_HTML, "==\n" if (2 <= $self->{_debug});
-    $oHit->source(&WWW::Search::strip_tags($oSPAN->as_text));
+    $oHit->source(&WWW::Search::strip_tags($sSource));
     $oHit->description(&WWW::Search::strip_tags($sDescription));
-    $oHit->change_date($sDate2);
+    $oHit->change_date(&WWW::Search::strip_tags($sDate));
     push(@{$self->{cache}}, $oHit);
     $self->{'_num_hits'}++;
     $iHits++;

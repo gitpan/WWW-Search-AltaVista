@@ -1,7 +1,7 @@
 # AltaVista.pm
 # by John Heidemann
 # Copyright (C) 1996-1998 by USC/ISI
-# $Id: AltaVista.pm,v 2.351 2004/02/24 13:49:51 Daddy Exp $
+# $Id: AltaVista.pm,v 2.352 2004/04/06 03:34:06 Daddy Exp $
 #
 # Complete copyright notice follows below.
 
@@ -144,7 +144,7 @@ use strict;
 use vars qw( @ISA $VERSION $MAINTAINER );
 @ISA = qw( WWW::Search Exporter );
 $MAINTAINER = 'Martin Thurn <mthurn@cpan.org>';
-$VERSION = do { my @r = (q$Revision: 2.351 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r };
+$VERSION = do { my @r = (q$Revision: 2.352 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r };
 
 sub undef_to_emptystring
   {
@@ -256,29 +256,6 @@ sub preprocess_results_page_OFF
   exit 88;
   } # preprocess_results_page
 
-sub save_old_hit
-  {
-  my $self = shift;
-  my $old_hit = shift;
-  my $old_raw = shift;
-  if (defined($old_hit))
-    {
-    $old_hit->raw($old_raw) if (defined($old_raw));
-    push(@{$self->{cache}}, $old_hit);
-    }
-  return (undef, undef);
-  } # save_old_hit
-
-sub begin_new_hit
-  {
-  my($self) = shift;
-  my($old_hit) = shift;
-  my($old_raw) = shift;
-  $self->save_old_hit($old_hit, $old_raw);
-  # Make a new hit.
-  return (new WWW::SearchResult, '');
-  } # begin_new_hit
-
 sub parse_tree
   {
   my $self = shift;
@@ -286,18 +263,6 @@ sub parse_tree
   my $iHits = 0;
   my $iCountSpoof = 0;
   my $WS = q{[\t\r\n\240\ ]};
-  # Get rid of "sponsored" results:
-  my @aoTABLE = $tree->look_down('_tag' => 'table',
-                                 'width' => '70%',
-                                 );
- TREE_TAG:
-  foreach (1..2)
-    {
-    my $oTREE = shift @aoTABLE;
-    last unless ref $oTREE;
-    $oTREE->detach;
-    $oTREE->delete;
-    } # for
   # Only try to parse the hit count if we haven't done so already:
   print STDERR " + start, approx_h_c is ==", $self->approximate_hit_count(), "==\n" if 2 <= $self->{_debug};
   if ($self->approximate_hit_count() < 1)
@@ -335,8 +300,8 @@ sub parse_tree
     # <a class="res" href="/r?ck_sm=4bf6b336&amp;ci=4939&amp;av_tc=null&amp;q=%7Cvirus+%7Cprotease&amp;rpos=1&amp;rpge=1&amp;rsrc=U&amp;ref=200020080&amp;uid=1da8cd3e47b05cd0&amp;r=http%3A%2F%2Fwww.mcafee.com%2F" onmouseout="status=''; return true;" onmouseover="status='http://www.mcafee.com/'; return true;">McAfee Security - Computer Virus Software and Internet Security For Your PC</a>
     next unless ref $oA;
     my $sA = $oA->as_HTML;
-    my $sURL = $1 if ($sA =~ m!onmouseover="status='(.+?)';!);
     print STDERR " +   found A==$sA==\n" if (2 <= $self->{_debug});
+    my $sURL = $self->absurl($self->{'_prev_url'}, $oA->attr('href'));
     my $sTitle = $oA->as_text;
     my $oSPAN = $oA;
  FIND_SPAN:
@@ -351,29 +316,15 @@ sub parse_tree
       # $oSPAN now is <span class=s> which contains the description
       # and the URL:
       print STDERR " +     found SPAN==", $oSPAN->as_HTML, "==\n" if (2 <= $self->{_debug});
-      my $oSPANurl = $oSPAN->look_down(
-                                       '_tag' => 'span',
-                                       'class' => 'ngrn',
-                                      );
-      if (ref $oSPANurl)
-        {
-        # $oSPANurl is <span class=ngrn> which contains the URL
-        # (without http:// in front of it):
-        print STDERR " +     found SPANurl==", $oSPANurl->as_HTML, "==\n" if (2 <= $self->{_debug});
-        $sURL ||= $self->absurl($self->{'_prev_url'},
-                                $oSPANurl->as_text);
-        print STDERR " +     the URL   is ==$sURL==\n" if (2 <= $self->{_debug});
-        print STDERR " +     the title is ==$sTitle==\n" if (2 <= $self->{_debug});
-        my $oHit = new WWW::Search::Result;
-        $oHit->add_url($sURL);
-        $oSPANurl->detach;
-        $oSPANurl->delete;
-        $oHit->title($sTitle);
-        $oHit->description(&WWW::Search::strip_tags($oSPAN->as_text));
-        push(@{$self->{cache}}, $oHit);
-        $self->{'_num_hits'}++;
-        $iHits++;
-        } # if
+      print STDERR " +     the URL   is ==$sURL==\n" if (2 <= $self->{_debug});
+      print STDERR " +     the title is ==$sTitle==\n" if (2 <= $self->{_debug});
+      my $oHit = new WWW::Search::Result;
+      $oHit->add_url($sURL);
+      $oHit->title($sTitle);
+      $oHit->description(&WWW::Search::strip_tags($oSPAN->as_text));
+      push(@{$self->{cache}}, $oHit);
+      $self->{'_num_hits'}++;
+      $iHits++;
       } # if
     $oA->detach;
     $oA->delete;

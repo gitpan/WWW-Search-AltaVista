@@ -16,14 +16,11 @@ my $iDump = 0;
 diag("Sending 0-page query to altavista.com...");
 &my_test(0, $WWW::Search::Test::bogus_query, 0, 0, $iDebug);
 DEBUG_NOW:
-$iDebug = 2;
-$iDump = 1;
-# &my_test(0, 'virus protease', undef, 55, $iDebug, $iDump);
-# exit 99;
 diag("Sending 1-page query to altavista.com...");
 $iDebug = 0;
 $iDump = 0;
-&my_test(0, '"Rhon'.'da Thurn"', undef, 49, $iDebug, $iDump);
+&my_test(0, '"Jer'.'emy Thurn"', undef, 49, $iDebug, $iDump);
+# &my_test(0, 'Rhonda Thurn. Li'.'li Vanderl'.'aan.', 1, 49, $iDebug, $iDump);
 my @ao = $WWW::Search::Test::oSearch->results();
 cmp_ok(0, '<', scalar(@ao), 'got any results');
 foreach my $oResult (@ao)
