@@ -1,3 +1,13 @@
+2003-11-24  Kingpin  <mthurn@verizon.net>
+
+	* t/de.t: add content tests; call env_proxy()
+	
+	* t/news.t: add content tests; call env_proxy()
+
+	* lib/WWW/Search/AltaVista.pm: re-write parser using HTML::Tree
+
+	* t/altavista.t (my_engine): new file
+
 2003-07-27  Kingpin  <mthurn@megapipe.net>
 
 	* lib/WWW/Search/AltaVista/DE.pm: new backend (thanks to Dmitry Katsubo)

@@ -1,7 +1,7 @@
 # AltaVista.pm
 # by John Heidemann
 # Copyright (C) 1996-1998 by USC/ISI
-# $Id: AltaVista.pm,v 2.29 2003-07-27 21:23:08-04 kingpin Exp kingpin $
+# $Id: AltaVista.pm,v 2.30 2003-11-24 21:08:27-05 kingpin Exp kingpin $
 #
 # Complete copyright notice follows below.
 
@@ -147,7 +147,7 @@ use vars qw( @ISA @EXPORT @EXPORT_OK $VERSION $MAINTAINER );
 @EXPORT_OK = qw();
 @ISA = qw(WWW::Search Exporter);
 $MAINTAINER = 'Martin Thurn <mthurn@cpan.org>';
-$VERSION = sprintf("%d.%02d", q$Revision: 2.29 $ =~ /(\d+)\.(\d+)/o);
+$VERSION = sprintf("%d.%02d", q$Revision: 2.30 $ =~ /(\d+)\.(\d+)/o);
 
 
 sub undef_to_emptystring
@@ -231,6 +231,8 @@ sub native_setup_search
   $self->{_debug} = $options_ref->{'search_debug'};
   $self->{_debug} = 2 if ($options_ref->{'search_parse_debug'});
   $self->{_debug} = 0 if (!defined($self->{_debug}));
+  # Pattern for matching result-count in many languages:
+  $self->{'_qr_count'} = qr{\s(?:found|fand).+?([\d,]+)\s+(result|headline|Ergebnisse)};
 
   # Finally figure out the url.
   $self->{_base_url} =
@@ -238,6 +240,17 @@ sub native_setup_search
   $self->{_options}{'search_host'} . $self->{_options}{'search_path'} .'?'. $options;
   # print STDERR $self->{_base_url} . "\n" if ($self->{_debug});
   } # native_setup_search
+
+
+sub preprocess_results_page_DEBUG
+  {
+  my $self = shift;
+  my $sPage = shift;
+  # return $sPage;
+  # For debugging only.  Print the page contents and abort.
+  print STDERR $sPage;
+  exit 88;
+  } # preprocess_results_page
 
 
 # private
@@ -268,8 +281,107 @@ sub begin_new_hit
 }
 
 
+sub parse_tree
+  {
+  my $self = shift;
+  my $tree = shift;
+  my $iHits = 0;
+  my $iCountSpoof = 0;
+  my $WS = q{[\t\r\n\240\ ]};
+  # Get rid of "sponsored" results:
+  my @aoTABLE = $tree->look_down('_tag' => 'table',
+                                 'width' => '70%',
+                                 );
+ TREE_TAG:
+  foreach (1..2)
+    {
+    my $oTREE = shift @aoTABLE;
+    last unless ref $oTREE;
+    $oTREE->detach;
+    $oTREE->delete;
+    } # for
+  # Only try to parse the hit count if we haven't done so already:
+  print STDERR " + start, approx_h_c is ==", $self->approximate_hit_count(), "==\n" if 2 <= $self->{_debug};
+  if ($self->approximate_hit_count() < 1)
+    {
+    # Sometimes the hit count is inside a <DIV> tag:
+    my @aoDIV = $tree->look_down('_tag' => 'div',
+                                  'class' => 'xs',
+                                 );
+ DIV_TAG:
+    foreach my $oDIV (@aoDIV)
+      {
+      next unless ref $oDIV;
+      print STDERR " + try DIV ==", $oDIV->as_HTML if 2 <= $self->{_debug};
+      my $s = $oDIV->as_text;
+      print STDERR " +   TEXT ==$s==\n" if 2 <= $self->{_debug};
+      if ($s =~ m!$self->{_qr_count}!i)
+        {
+        my $iCount = $1;
+        $iCount =~ s!,!!g;
+        $self->approximate_result_count($iCount);
+        last DIV_TAG;
+        } # if
+      } # foreach DIV_TAG
+    } # if
+  print STDERR " + found approx_h_c is ==", $self->approximate_hit_count(), "==\n" if 2 <= $self->{_debug};
+  # Get the hits:
+  my @aoA = $tree->look_down('_tag' => 'a',
+                             'class' => 'res',
+                            );
+ A_TAG:
+  foreach my $oA (@aoA)
+    {
+    next unless ref $oA;
+    my $sTitle = $oA->as_text;
+    my $oSPAN = $oA;
+    do
+      {
+      $oSPAN = $oSPAN->right;
+      last if ! ref $oSPAN;
+      } until ($oSPAN->tag eq 'span');
+    if (ref $oSPAN)
+      {
+      my $oSPANurl = $oSPAN->look_down(
+                                       '_tag' => 'span',
+                                       'class' => 'ngrn',
+                                      );
+      if (ref $oSPANurl)
+        {
+        my $oHit = new WWW::Search::Result;
+        $oHit->add_url($self->absurl($self->{'_prev_url'},
+                                     $oSPANurl->as_text));
+        $oSPANurl->detach;
+        $oSPANurl->delete;
+        $oHit->title($sTitle);
+        $oHit->description(&WWW::Search::strip_tags($oSPAN->as_text));
+        push(@{$self->{cache}}, $oHit);
+        $self->{'_num_hits'}++;
+        $iHits++;
+        } # if
+      } # if
+    $oA->detach;
+    $oA->delete;
+    } # foreach A_TAG
+  # Find the 'next page' link:
+  @aoA = $tree->look_down('_tag' => 'a',
+                         );
+ NEXT_TAG:
+  foreach my $oA (@aoA)
+    {
+    next NEXT_TAG unless ref $oA;
+    # Multilingual version:
+    next NEXT_TAG unless $oA->as_text =~ m!\s>>\Z!;
+    # English-only version:
+    # next NEXT_TAG unless $oA->as_text eq q{Next >>};
+    $self->{_next_url} = $self->absurl($self->{'_prev_url'}, $oA->attr('href'));
+    last NEXT_TAG;
+    } # foreach
+  return $iHits;
+  } # parse_tree
+
 # private
-sub native_retrieve_some
+sub native_retrieve_some_OLD
 {
     my ($self) = @_;
 
@@ -285,6 +397,9 @@ sub native_retrieve_some
       print STDERR " +   failed: ", $response->as_string if ($self->{_debug});
       return undef;
       } # if
+
+    print STDERR $response->content;
+    exit 88;
 
     # parse the output
     my ($HEADER, $HITS, $INHIT, $TRAILER, $POST_NEXT) = (1..10);  # order matters
