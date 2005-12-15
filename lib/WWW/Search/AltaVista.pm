@@ -1,7 +1,7 @@
 # AltaVista.pm
 # by John Heidemann
 # Copyright (C) 1996-1998 by USC/ISI
-# $Id: AltaVista.pm,v 2.356 2005/12/15 04:21:38 Daddy Exp $
+# $Id: AltaVista.pm,v 2.901 2005/12/15 19:47:08 Daddy Exp $
 #
 # Complete copyright notice follows below.
 
@@ -148,7 +148,7 @@ use strict;
 use vars qw( @ISA $VERSION $MAINTAINER );
 @ISA = qw( WWW::Search Exporter );
 $MAINTAINER = 'Martin Thurn <mthurn@cpan.org>';
-$VERSION = do { my @r = (q$Revision: 2.356 $ =~ /\d+/g); sprintf "%d."."%03d" x $#r, @r };
+$VERSION = do { my @r = (q$Revision: 2.901 $ =~ /\d+/g); sprintf "%d."."%03d" x $#r, @r };
 
 sub undef_to_emptystring
   {
@@ -362,4 +362,3 @@ http://www.altavista.com/web/results?pg=aq&avkw=qtrp&aqmode=s&aqa=&aqp=&aqo=mart
 
 gui query results:
 http://www.altavista.com/web/results?q=Rhonda+Thurn&kgs=0&kls=0&avkw=qtrp
-
