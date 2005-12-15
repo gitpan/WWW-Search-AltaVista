@@ -1,7 +1,7 @@
 # AltaVista.pm
 # by John Heidemann
 # Copyright (C) 1996-1998 by USC/ISI
-# $Id: AltaVista.pm,v 2.352 2004/04/06 03:34:06 Daddy Exp $
+# $Id: AltaVista.pm,v 2.356 2005/12/15 04:21:38 Daddy Exp $
 #
 # Complete copyright notice follows below.
 
@@ -95,6 +95,10 @@ Leave off the http:// from the site.
 
 =item Not all of the above options have been tested.
 
+=item Please report bugs and send feature requests via email to
+C<bug-WWW-Search-AltaVista@rt.cpan.org>, or via the web interface at
+L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-Search-AltaVista>.
+
 =back
 
 =head1 SEE ALSO
@@ -106,9 +110,9 @@ or the specialized AltaVista searches described in options.
 =head1 AUTHOR
 
 C<WWW::Search::AltaVista> was written by John Heidemann,
-<johnh@isi.edu>.
+C<johnh@isi.edu>.
 C<WWW::Search::AltaVista> is maintained by Martin Thurn,
-<mthurn@cpan.org>.
+C<mthurn@cpan.org>.
 
 =head1 COPYRIGHT
 
@@ -144,7 +148,7 @@ use strict;
 use vars qw( @ISA $VERSION $MAINTAINER );
 @ISA = qw( WWW::Search Exporter );
 $MAINTAINER = 'Martin Thurn <mthurn@cpan.org>';
-$VERSION = do { my @r = (q$Revision: 2.352 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r };
+$VERSION = do { my @r = (q$Revision: 2.356 $ =~ /\d+/g); sprintf "%d."."%03d" x $#r, @r };
 
 sub undef_to_emptystring
   {
@@ -302,7 +306,9 @@ sub parse_tree
     my $sA = $oA->as_HTML;
     print STDERR " +   found A==$sA==\n" if (2 <= $self->{_debug});
     my $sURL = $self->absurl($self->{'_prev_url'}, $oA->attr('href'));
+    print STDERR " +     the URL   is ==$sURL==\n" if (2 <= $self->{_debug});
     my $sTitle = $oA->as_text;
+    print STDERR " +     the title is ==$sTitle==\n" if (2 <= $self->{_debug});
     my $oSPAN = $oA;
  FIND_SPAN:
     while (1)
@@ -316,8 +322,6 @@ sub parse_tree
       # $oSPAN now is <span class=s> which contains the description
       # and the URL:
       print STDERR " +     found SPAN==", $oSPAN->as_HTML, "==\n" if (2 <= $self->{_debug});
-      print STDERR " +     the URL   is ==$sURL==\n" if (2 <= $self->{_debug});
-      print STDERR " +     the title is ==$sTitle==\n" if (2 <= $self->{_debug});
       my $oHit = new WWW::Search::Result;
       $oHit->add_url($sURL);
       $oHit->title($sTitle);
@@ -351,7 +355,11 @@ sub parse_tree
 __END__
 
 advanced search results:
+
+full URL, as of 2005-12 = http://www.altavista.com/web/results?itag=ody&pg=aq&aqmode=s&aqa=all&aqp=this+phrase&aqo=any&aqn=none&aqb=&kgs=1&kls=0&d2=0&dt=dtrange&dfr%5Bd%5D=1&dfr%5Bm%5D=1&dfr%5By%5D=1980&dto%5Bd%5D=14&dto%5Bm%5D=12&dto%5By%5D=1995&filetype=&rc=dmn&swd=&lh=&nbq=10
+
 http://www.altavista.com/web/results?pg=aq&avkw=qtrp&aqmode=s&aqa=&aqp=&aqo=martin+thurn&aqn=&aqb=&aqs=&kgs=0&kls=0&dt=tmperiod&d2=0&d0=&d1=&filetype=&rc=dmn&swd=&lh=&nbq=50
 
 gui query results:
 http://www.altavista.com/web/results?q=Rhonda+Thurn&kgs=0&kls=0&avkw=qtrp
+

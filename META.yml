@@ -1,0 +1,16 @@
+name: WWW-Search-AltaVista
+version: 2.143
+author: Martin Thurn <mthurn@cpan.org>
+license: perl
+distribution_type: module
+build_requires:
+  Test::More: 0
+requires:
+  perl: 5.004
+  Date::Manip: 0
+  HTML::TreeBuilder: 0
+  WWW::Search::Test: 2.263
+no_index:
+  directory:
+    - inc
+generated_by: Module::Install version 0.44
