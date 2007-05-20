@@ -1,3 +1,7 @@
+2007-05-20    <Daddy@C-3PO>
+
+	* use strict in all modules
+
 2004-04-05  Kingpin  <mthurn@verizon.net>
 
 	* lib/WWW/Search/AltaVista/News.pm: handle new HTML page format

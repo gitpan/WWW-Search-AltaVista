@@ -1,5 +1,5 @@
 
-# $Id: Careers.pm,v 1.3 2005/12/15 20:09:04 Daddy Exp $
+# $Id: Careers.pm,v 1.12 2007/05/20 14:05:59 Daddy Exp $
 
 # AltaVistaCareers.pm
 # Author: Alexander Tkatchev 
@@ -66,16 +66,15 @@ MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 
 package WWW::Search::AltaVista::Careers;
 
-require Exporter;
-require WWW::SearchResult;
-require HTML::TokeParser;
-@EXPORT = qw();
-@EXPORT_OK = qw();
-@ISA = qw(WWW::Search Exporter);
-$VERSION = do { my @r = (q$Revision: 1.3 $ =~ /\d+/g); sprintf "%d."."%03d" x $#r, @r };
+use strict;
 
+use base 'WWW::Search::AltaVista';
 use Carp ();
-use WWW::Search(generic_option);
+use HTML::TokeParser;
+use WWW::Search qw( generic_option );
+use WWW::SearchResult;
+our
+$VERSION = do { my @r = (q$Revision: 1.12 $ =~ /\d+/g); sprintf "%d."."%03d" x $#r, @r };
 
 sub native_setup_search
   {
@@ -197,4 +196,3 @@ sub native_retrieve_some
 1;
 
 __END__
-

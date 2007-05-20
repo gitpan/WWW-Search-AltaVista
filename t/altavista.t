@@ -18,11 +18,11 @@ my $iDump = 0;
 diag("Sending 0-page query to altavista.com...");
 &tm_run_test(0, $WWW::Search::Test::bogus_query, 0, 0, $iDebug);
 
-DEBUG_NOW:
+# DEBUG_NOW:
 diag("Sending 1-page query to altavista.com...");
 $iDebug = 0;
 $iDump = 0;
-&tm_run_test(0, 'wi'.'zadrry', 1, 49, $iDebug, $iDump);
+&tm_run_test(0, 'noo'.'tebookks', 1, 49, $iDebug, $iDump);
 my @ao = $WWW::Search::Test::oSearch->results();
 cmp_ok(0, '<', scalar(@ao), 'got any results');
 foreach my $oResult (@ao)
@@ -35,7 +35,37 @@ foreach my $oResult (@ao)
          'result description is not empty');
   } # foreach
 
-# exit 0; # for debugging
+DEBUG_NOW:
+goto SKIP_PHRASE_TEST;
+diag("Sending phrase query to altavista.com...");
+$iDebug = 1;
+$iDump = 0;
+# $WWW::Search::Test::oSearch->{_allow_empty_query} = 1;
+$WWW::Search::Test::oSearch->native_query('junk crap bile', {
+                                               search_debug => $iDebug,
+                                               # Clear out the "OR" query:
+                                               aqo => '',
+                                               # Put our query in the
+                                               # "PHRASE" slot:
+                                               aqp => 'Thurn Martin',
+                                              });
+for (1..49)
+  {
+  push @ao, $WWW::Search::Test::oSearch->next_result();
+  } # for
+@ao = grep { defined } @ao;
+cmp_ok(10, '<', scalar(@ao), 'got any results');
+foreach my $oResult (@ao)
+  {
+  like($oResult->url, qr{\Ahttp://},
+       'result URL is http');
+  cmp_ok($oResult->title, 'ne', '',
+         'result Title is not empty');
+  cmp_ok($oResult->description, 'ne', '',
+         'result description is not empty');
+  } # foreach
+SKIP_PHRASE_TEST:
+goto ALL_DONE; # for debugging
 
 diag("Sending multi-page query to altavista.com...");
 $iDebug = 0;
@@ -63,7 +93,7 @@ $iDebug = 0;
 &tm_run_test(0, $WWW::Search::Test::bogus_query, 0, 0, $iDebug);
 SKIP_ADVANCEDWEB:
 ;
-# all done
+ALL_DONE:
 exit 0;
 
 __END__

@@ -1,16 +1,21 @@
-name: WWW-Search-AltaVista
-version: 2.144
+--- 
 author: Martin Thurn <mthurn@cpan.org>
-license: perl
-distribution_type: module
-build_requires:
+build_requires: 
   Test::More: 0
-requires:
-  perl: 5.004
+distribution_type: module
+generated_by: Module::Install version 0.67
+license: perl
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: WWW-Search-AltaVista
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
   Date::Manip: 0
   HTML::TreeBuilder: 0
   WWW::Search::Test: 2.263
-no_index:
-  directory:
-    - inc
-generated_by: Module::Install version 0.44
+  perl: 5.004
+version: 2.145
