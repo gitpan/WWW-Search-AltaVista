@@ -1,3 +1,7 @@
+2007-06-27    <Daddy@C-3PO>
+
+	* lib/WWW/Search/AltaVista.pm (parse_tree): ignore advertised links; fix result-count parser
+
 2007-05-20    <Daddy@C-3PO>
 
 	* use strict in all modules

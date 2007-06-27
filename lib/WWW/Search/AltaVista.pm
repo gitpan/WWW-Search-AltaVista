@@ -1,7 +1,7 @@
 # AltaVista.pm
 # by John Heidemann
 # Copyright (C) 1996-1998 by USC/ISI
-# $Id: AltaVista.pm,v 2.902 2007/05/20 14:06:10 Daddy Exp $
+# $Id: AltaVista.pm,v 2.903 2007/06/27 19:26:05 Daddy Exp $
 #
 # Complete copyright notice follows below.
 
@@ -149,7 +149,7 @@ use strict;
 use base 'WWW::Search';
 our $MAINTAINER = 'Martin Thurn <mthurn@cpan.org>';
 our
-$VERSION = do { my @r = (q$Revision: 2.902 $ =~ /\d+/g); sprintf "%d."."%03d" x $#r, @r };
+$VERSION = do { my @r = (q$Revision: 2.903 $ =~ /\d+/g); sprintf "%d."."%03d" x $#r, @r };
 
 sub undef_to_emptystring
   {
@@ -276,6 +276,10 @@ sub parse_tree
     my @aoDIV = $tree->look_down('_tag' => 'div',
                                   'class' => 'xs',
                                  );
+    # Sometimes the hit count is inside a <SPAN> tag:
+    push @aoDIV, $tree->look_down('_tag' => 'span',
+                                  'class' => 'y',
+                                 );
     my $qrCount = $self->count_pattern;
  DIV_TAG:
     foreach my $oDIV (@aoDIV)
@@ -289,11 +293,11 @@ sub parse_tree
         my $iCount = $1 || '';
         $iCount =~ tr!.,!!d;
         $self->approximate_result_count($iCount);
+        print STDERR " + found approx_h_c is ==", $self->approximate_hit_count(), "==\n" if (2 <= $self->{_debug});
         last DIV_TAG;
         } # if
       } # foreach DIV_TAG
     } # if
-  print STDERR " + found approx_h_c is ==", $self->approximate_hit_count(), "==\n" if (2 <= $self->{_debug});
   # Get the hits:
   my @aoA = $tree->look_down(
                              '_tag' => 'a',
@@ -308,6 +312,8 @@ sub parse_tree
     print STDERR " +   found A==$sA==\n" if (2 <= $self->{_debug});
     my $sURL = $self->absurl($self->{'_prev_url'}, $oA->attr('href'));
     print STDERR " +     the URL   is ==$sURL==\n" if (2 <= $self->{_debug});
+    # Ignore advertising links:
+    next if ($sURL =~ m!//rc10\.overture\.com!);
     my $sTitle = $oA->as_text;
     print STDERR " +     the title is ==$sTitle==\n" if (2 <= $self->{_debug});
     my $oSPAN = $oA;

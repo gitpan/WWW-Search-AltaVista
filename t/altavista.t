@@ -1,4 +1,4 @@
-# $rcs = ' $Id: altavista.t,v 1.10 2005/12/15 03:56:30 Daddy Exp $ ' ;
+# $rcs = ' $Id: altavista.t,v 1.11 2007/06/27 19:27:14 Daddy Exp $ ' ;
 
 use ExtUtils::testlib;
 use Test::More no_plan;
@@ -16,13 +16,15 @@ my $iDump = 0;
 # goto SKIP_BASIC;
 # These tests return no results (but we should not get an HTTP error):
 diag("Sending 0-page query to altavista.com...");
-&tm_run_test(0, $WWW::Search::Test::bogus_query, 0, 0, $iDebug);
+$iDebug = 0;
+$iDump = 0;
+&tm_run_test(0, $WWW::Search::Test::bogus_query, 0, 0, $iDebug, $iDump);
 
 # DEBUG_NOW:
 diag("Sending 1-page query to altavista.com...");
 $iDebug = 0;
 $iDump = 0;
-&tm_run_test(0, 'noo'.'tebookks', 1, 49, $iDebug, $iDump);
+&tm_run_test(0, 'noo'.'teboooks', 1, 49, $iDebug, $iDump);
 my @ao = $WWW::Search::Test::oSearch->results();
 cmp_ok(0, '<', scalar(@ao), 'got any results');
 foreach my $oResult (@ao)

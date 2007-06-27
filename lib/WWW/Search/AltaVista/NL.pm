@@ -3,7 +3,7 @@
 # by Erik Smit
 # Copyright (C) 1996-1998 by USC/ISI
 # Copyright (C) 2001 by Different Soft
-# $Id: NL.pm,v 1.4 2007/05/20 14:05:45 Daddy Exp $
+# $Id: NL.pm,v 1.111 2007/06/10 01:10:07 Daddy Exp $
 #
 # Complete copyright notice follows below.
 #
@@ -119,7 +119,7 @@ use Carp ();
 use WWW::Search qw( generic_option );
 use WWW::SearchResult;
 our
-$VERSION = do { my @r = (q$Revision: 1.4 $ =~ /\d+/g); sprintf "%d."."%03d" x $#r, @r };
+$VERSION = do { my @r = (q$Revision: 1.111 $ =~ /\d+/g); sprintf "%d."."%03d" x $#r, @r };
 
 sub undef_to_emptystring {
     return defined($_[0]) ? $_[0] : "";
