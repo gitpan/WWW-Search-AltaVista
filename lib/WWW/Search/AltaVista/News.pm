@@ -1,7 +1,7 @@
 # News.pm
 # by John Heidemann
 # Copyright (C) 1996 by USC/ISI
-# $Id: News.pm,v 2.105 2007/05/20 14:05:45 Daddy Exp $
+# $Id: News.pm,v 2.106 2007/08/11 15:04:33 Daddy Exp $
 #
 # Complete copyright notice follows below.
 
@@ -63,7 +63,7 @@ use strict;
 use base 'WWW::Search::AltaVista';
 
 our
-$VERSION = do { my @r = (q$Revision: 2.105 $ =~ /\d+/g); sprintf "%d."."%03d" x $#r, @r };
+$VERSION = do { my @r = (q$Revision: 2.106 $ =~ /\d+/g); sprintf "%d."."%03d" x $#r, @r };
 our $MAINTAINER = 'Martin Thurn <mthurn@cpan.org>';
 
 # private
@@ -105,7 +105,7 @@ sub parse_tree
   print STDERR " + start, approx_h_c is ==", $self->approximate_hit_count(), "==\n" if 2 <= $self->{_debug};
   if ($self->approximate_hit_count() < 1)
     {
-    my $qrCount = $self->count_pattern;
+    my $qrCount = $self->_count_pattern;
     # The hit count is inside a <B> tag:
     my @aoB = $tree->look_down('_tag' => 'b',
                                'class' => 'lbl',

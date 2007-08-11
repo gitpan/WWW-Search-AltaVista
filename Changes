@@ -1,3 +1,7 @@
+2007-08-11    <Daddy@C-3PO>
+
+	* various: improved pod coverage
+
 2007-06-27    <Daddy@C-3PO>
 
 	* lib/WWW/Search/AltaVista.pm (parse_tree): ignore advertised links; fix result-count parser

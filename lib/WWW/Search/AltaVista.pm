@@ -1,7 +1,7 @@
 # AltaVista.pm
 # by John Heidemann
 # Copyright (C) 1996-1998 by USC/ISI
-# $Id: AltaVista.pm,v 2.903 2007/06/27 19:26:05 Daddy Exp $
+# $Id: AltaVista.pm,v 2.904 2007/08/11 15:05:06 Daddy Exp $
 #
 # Complete copyright notice follows below.
 
@@ -89,48 +89,7 @@ Leave off the http:// from the site.
 
 =back
 
-=head1 BUGS
-
-=over
-
-=item Not all of the above options have been tested.
-
-=item Please report bugs and send feature requests via email to
-C<bug-WWW-Search-AltaVista@rt.cpan.org>, or via the web interface at
-L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-Search-AltaVista>.
-
-=back
-
-=head1 SEE ALSO
-
-To make new back-ends, see L<WWW::Search>,
-or the specialized AltaVista searches described in options.
-
-
-=head1 AUTHOR
-
-C<WWW::Search::AltaVista> was written by John Heidemann,
-C<johnh@isi.edu>.
-C<WWW::Search::AltaVista> is maintained by Martin Thurn,
-C<mthurn@cpan.org>.
-
-=head1 COPYRIGHT
-
-Copyright (c) 1996-1998 University of Southern California.
-All rights reserved.
-
-Redistribution and use in source and binary forms are permitted
-provided that the above copyright notice and this paragraph are
-duplicated in all such forms and that any documentation, advertising
-materials, and other materials related to such distribution and use
-acknowledge that the software was developed by the University of
-Southern California, Information Sciences Institute.  The name of the
-University may not be used to endorse or promote products derived from
-this software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
-WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+=head1 PUBLIC METHODS
 
 =cut
 
@@ -149,12 +108,18 @@ use strict;
 use base 'WWW::Search';
 our $MAINTAINER = 'Martin Thurn <mthurn@cpan.org>';
 our
-$VERSION = do { my @r = (q$Revision: 2.903 $ =~ /\d+/g); sprintf "%d."."%03d" x $#r, @r };
+$VERSION = do { my @r = (q$Revision: 2.904 $ =~ /\d+/g); sprintf "%d."."%03d" x $#r, @r };
 
-sub undef_to_emptystring
+sub _undef_to_emptystring
   {
   return defined($_[0]) ? $_[0] : "";
-  } # undef_to_emptystring
+  } # _undef_to_emptystring
+
+=head2 gui_query
+
+Call this instead of native_query() if you want to get the same results as your average Joe web surfer.
+
+=cut
 
 sub gui_query
   {
@@ -168,6 +133,15 @@ sub gui_query
                         };
   return $self->native_query($sQuery, $rh);
   } # gui_query
+
+=head1 PRIVATE METHODS
+
+=head2 native_setup_search
+
+This private method does the heavy lifting after you call native_query()
+or gui_query().
+
+=cut
 
 sub native_setup_search
   {
@@ -237,7 +211,7 @@ sub native_setup_search
   # print STDERR $self->{_base_url} . "\n" if ($self->{_debug});
   } # native_setup_search
 
-sub count_pattern
+sub _count_pattern
   {
   # Pattern for matching result-count in many languages.
   # Language-specific subclasses might need to override this.
@@ -248,10 +222,10 @@ sub count_pattern
             # This covers English and German:
             (?:result|headline|Ergebnisse)
             }x;
-  } # count_pattern
+  } # _count_pattern
 
 
-sub preprocess_results_page_OFF
+sub _preprocess_results_page
   {
   my $self = shift;
   my $sPage = shift;
@@ -259,7 +233,13 @@ sub preprocess_results_page_OFF
   # For debugging only.  Print the page contents and abort.
   print STDERR '='x 25, "\n\n", $sPage, "\n\n", '='x 25;
   exit 88;
-  } # preprocess_results_page
+  } # _preprocess_results_page
+
+=head2 parse_tree
+
+This private method does the hard work of parsing the results out of the HTML.
+
+=cut
 
 sub parse_tree
   {
@@ -280,7 +260,7 @@ sub parse_tree
     push @aoDIV, $tree->look_down('_tag' => 'span',
                                   'class' => 'y',
                                  );
-    my $qrCount = $self->count_pattern;
+    my $qrCount = $self->_count_pattern;
  DIV_TAG:
     foreach my $oDIV (@aoDIV)
       {
@@ -356,6 +336,51 @@ sub parse_tree
     } # foreach
   return $iHits;
   } # parse_tree
+
+
+=head1 BUGS
+
+=over
+
+=item Not all of the above options have been tested.
+
+=item Please report bugs and send feature requests via email to
+C<bug-WWW-Search-AltaVista@rt.cpan.org>, or via the web interface at
+L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-Search-AltaVista>.
+
+=back
+
+=head1 SEE ALSO
+
+To make new back-ends, see L<WWW::Search>,
+or the specialized AltaVista searches described in options.
+
+=head1 AUTHOR
+
+C<WWW::Search::AltaVista> was written by John Heidemann,
+C<johnh@isi.edu>.
+C<WWW::Search::AltaVista> is maintained by Martin Thurn,
+C<mthurn@cpan.org>.
+
+=head1 COPYRIGHT
+
+Copyright (c) 1996-1998 University of Southern California.
+All rights reserved.
+
+Redistribution and use in source and binary forms are permitted
+provided that the above copyright notice and this paragraph are
+duplicated in all such forms and that any documentation, advertising
+materials, and other materials related to such distribution and use
+acknowledge that the software was developed by the University of
+Southern California, Information Sciences Institute.  The name of the
+University may not be used to endorse or promote products derived from
+this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+=cut
 
 1;
 
