@@ -1,6 +1,6 @@
 # AltaVista/Intranet.pm
 # by Martin Thurn
-# $Id: Intranet.pm,v 1.10 2007/05/20 14:05:44 Daddy Exp $
+# $Id: Intranet.pm,v 1.11 2007/08/22 00:49:42 Daddy Exp $
 #
 # Complete copyright notice follows below.
 
@@ -105,7 +105,12 @@ our $TEST_CASES = <<"ENDTESTCASES";
 &no_test('AltaVista::Intranet', '$MAINTAINER');
 ENDTESTCASES
 
-# private
+=head2 native_setup_search
+
+This private method does the heavy lifting after native_query() is called.
+
+=cut
+
 sub native_setup_search
   {
   my ($self, $sQuery, $rhOptions) = @_;
@@ -129,18 +134,21 @@ sub native_setup_search
   } # native_setup_search
 
 
-# private
+=head2 native_retrieve_some
+
+This private method does the heavy lifting of communicating
+with the server.
+
+=cut
+
 sub native_retrieve_some
   {
   my ($self) = @_;
   print STDERR " *   AltaVista::Intranet::native_retrieve_some()\n" if $self->{_debug};
-  
   # fast exit if already done
   return undef if (!defined($self->{_next_url}));
-  
   # If this is not the first page of results, sleep so as to not overload the server:
   $self->user_agent_delay if 1 < $self->{'_next_to_retrieve'};
-  
   # get some
   print STDERR " *   sending request (",$self->{_next_url},")\n" if $self->{_debug};
   my($response) = $self->http_request('GET', $self->{_next_url});
@@ -149,7 +157,6 @@ sub native_retrieve_some
     {
     return undef;
     }
-  
   $self->{'_next_url'} = undef;
   print STDERR " *   got response\n" if $self->{_debug};
   # parse the output

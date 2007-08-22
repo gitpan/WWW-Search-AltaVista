@@ -1,5 +1,5 @@
 
-# $Id: Careers.pm,v 1.12 2007/05/20 14:05:59 Daddy Exp $
+# $Id: Careers.pm,v 1.13 2007/08/22 00:49:42 Daddy Exp $
 
 # AltaVistaCareers.pm
 # Author: Alexander Tkatchev 
@@ -74,7 +74,13 @@ use HTML::TokeParser;
 use WWW::Search qw( generic_option );
 use WWW::SearchResult;
 our
-$VERSION = do { my @r = (q$Revision: 1.12 $ =~ /\d+/g); sprintf "%d."."%03d" x $#r, @r };
+$VERSION = do { my @r = (q$Revision: 1.13 $ =~ /\d+/g); sprintf "%d."."%03d" x $#r, @r };
+
+=head2 native_setup_search
+
+This private method does the heavy lifting after native_query() is called.
+
+=cut
 
 sub native_setup_search
   {
@@ -117,7 +123,13 @@ sub native_setup_search
   } # native_setup_search
 
 
-# private
+=head2 native_retrieve_some
+
+This private method does the heavy lifting of communicating
+with the server.
+
+=cut
+
 sub native_retrieve_some
   {
   my ($self) = @_;

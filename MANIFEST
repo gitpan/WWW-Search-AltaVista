@@ -24,4 +24,5 @@ README
 t/altavista.t
 t/de.t
 t/news.t
+t/pod-coverage.t
 t/pod.t

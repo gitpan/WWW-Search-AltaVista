@@ -1,6 +1,6 @@
 # by John Heidemann
 # Copyright (C) 1996 by USC/ISI
-# $Id: AdvancedNews.pm,v 1.2 2007/05/20 14:05:44 Daddy Exp $
+# $Id: AdvancedNews.pm,v 1.3 2007/08/22 00:49:41 Daddy Exp $
 #
 # Complete copyright notice follows below.
 
@@ -58,22 +58,27 @@ use strict;
 
 use base 'WWW::Search::AltaVista';
 
-# private
+=head2 native_setup_search
+
+This private method does the heavy lifting after native_query() is called.
+
+=cut
+
 sub native_setup_search
-{
-    my($self) = shift;
-    if (!defined($self->{_options})) {
-	$self->{_options} = {
-	    pg => 'aq',
-	    'text' => 'yes',
-	    what => 'news',
-	    fmt => 'd',
-	    'search_url' => 'http://www.altavista.com/cgi-bin/query',
-        };
+  {
+  my($self) = shift;
+  if (!defined($self->{_options})) {
+    $self->{_options} = {
+                         pg => 'aq',
+                         'text' => 'yes',
+                         what => 'news',
+                         fmt => 'd',
+                         'search_url' => 'http://www.altavista.com/cgi-bin/query',
+                        };
     };
-    # let AltaVista.pm finish up the hard work.
-    return $self->SUPER::native_setup_search(@_);
-}
+  # let AltaVista.pm finish up the hard work.
+  return $self->SUPER::native_setup_search(@_);
+  } # native_setup_search
 
 1;
 

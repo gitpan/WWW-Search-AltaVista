@@ -1,6 +1,6 @@
 # DE.pm
 # by Martin Thurn
-# $Id: DE.pm,v 1.3 2007/05/20 14:05:44 Daddy Exp $
+# $Id: DE.pm,v 1.4 2007/08/22 00:49:42 Daddy Exp $
 
 =head1 NAME
 
@@ -35,9 +35,14 @@ use strict;
 
 use base 'WWW::Search::AltaVista';
 our
-$VERSION = sprintf("%d.%02d", q$Revision: 1.3 $ =~ /(\d+)\.(\d+)/o);
+$VERSION = sprintf("%d.%02d", q$Revision: 1.4 $ =~ /(\d+)\.(\d+)/o);
 
-# private
+=head2 native_setup_search
+
+This private method does the heavy lifting after native_query() is called.
+
+=cut
+
 sub native_setup_search
   {
   my $self = shift;

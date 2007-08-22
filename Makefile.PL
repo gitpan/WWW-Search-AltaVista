@@ -1,9 +1,9 @@
-# $rcs = ' $Id: Makefile.PL,v 1.8 2007/08/11 15:06:21 Daddy Exp $ ' ;
+# $rcs = ' $Id: Makefile.PL,v 1.9 2007/08/22 00:49:51 Daddy Exp $ ' ;
 
 use inc::Module::Install;
 
 name('WWW-Search-AltaVista');
-version(2.147);
+version(2.148);
 
 author('Martin Thurn <mthurn@cpan.org>');
 license('perl');

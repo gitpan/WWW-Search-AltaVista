@@ -1,7 +1,7 @@
 # News.pm
 # by John Heidemann
 # Copyright (C) 1996 by USC/ISI
-# $Id: News.pm,v 2.106 2007/08/11 15:04:33 Daddy Exp $
+# $Id: News.pm,v 2.107 2007/08/20 00:19:13 Daddy Exp $
 #
 # Complete copyright notice follows below.
 
@@ -15,7 +15,6 @@ WWW::Search::AltaVista::News - class for Alta Vista news searching
     require WWW::Search;
     $search = new WWW::Search('AltaVista::News');
 
-
 =head1 DESCRIPTION
 
 This class implements the AltaVista news search
@@ -28,29 +27,7 @@ Details of AltaVista can be found at L<WWW::Search::AltaVista>.
 This class exports no public interface; all interaction should
 be done through WWW::Search objects.
 
-
-=head1 AUTHOR
-
-C<WWW::Search> is written by John Heidemann, <johnh@isi.edu>.
-
-
-=head1 COPYRIGHT
-
-Copyright (c) 1996 University of Southern California.
-All rights reserved.
-
-Redistribution and use in source and binary forms are permitted
-provided that the above copyright notice and this paragraph are
-duplicated in all such forms and that any documentation, advertising
-materials, and other materials related to such distribution and use
-acknowledge that the software was developed by the University of
-Southern California, Information Sciences Institute.  The name of the
-University may not be used to endorse or promote products derived from
-this software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
-WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+=head1 METHODS
 
 =cut
 
@@ -63,10 +40,15 @@ use strict;
 use base 'WWW::Search::AltaVista';
 
 our
-$VERSION = do { my @r = (q$Revision: 2.106 $ =~ /\d+/g); sprintf "%d."."%03d" x $#r, @r };
+$VERSION = do { my @r = (q$Revision: 2.107 $ =~ /\d+/g); sprintf "%d."."%03d" x $#r, @r };
 our $MAINTAINER = 'Martin Thurn <mthurn@cpan.org>';
 
-# private
+=head2 native_setup_search (private)
+
+This method does the heavy-lifting after native_query() is called.
+
+=cut
+
 sub native_setup_search
   {
   my $self = shift;
@@ -85,7 +67,7 @@ sub native_setup_search
   return $self->SUPER::native_setup_search($sQuery, @_);
   } # native_setup_search
 
-sub preprocess_results_page_OFF
+sub _preprocess_results_page
   {
   my $self = shift;
   my $sPage = shift;
@@ -94,6 +76,12 @@ sub preprocess_results_page_OFF
   print STDERR '='x 25, "\n\n", $sPage, "\n\n", '='x 25;
   exit 88;
   } # preprocess_results_page
+
+=head2 parse_tree
+
+This method parses the HTML of the search results.
+
+=cut
 
 sub parse_tree
   {
@@ -186,6 +174,31 @@ sub parse_tree
   } # parse_tree
 
 1;
+
+=head1 AUTHOR
+
+C<WWW::Search> is written by John Heidemann, <johnh@isi.edu>.
+
+
+=head1 COPYRIGHT
+
+Copyright (c) 1996 University of Southern California.
+All rights reserved.
+
+Redistribution and use in source and binary forms are permitted
+provided that the above copyright notice and this paragraph are
+duplicated in all such forms and that any documentation, advertising
+materials, and other materials related to such distribution and use
+acknowledge that the software was developed by the University of
+Southern California, Information Sciences Institute.  The name of the
+University may not be used to endorse or promote products derived from
+this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+=cut
 
 __END__
 
