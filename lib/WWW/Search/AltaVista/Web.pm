@@ -18,10 +18,11 @@ L<WWW::Search::AltaVista>.
 package WWW::Search::AltaVista::Web;
 
 use strict;
+use warnings;
 
 use base 'WWW::Search::AltaVista';
 our
-$VERSION = do { my @r = (q$Revision: 1.5 $ =~ /\d+/g); sprintf "%d."."%03d" x $#r, @r };
+$VERSION = do { my @r = (q$Revision: 1.6 $ =~ /\d+/g); sprintf "%d."."%03d" x $#r, @r };
 
 1;
 

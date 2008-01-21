@@ -1,7 +1,7 @@
 # AltaVista.pm
 # by John Heidemann
 # Copyright (C) 1996-1998 by USC/ISI
-# $Id: AltaVista.pm,v 2.904 2007/08/11 15:05:06 Daddy Exp $
+# $Id: AltaVista.pm,v 2.905 2008/01/21 02:04:11 Daddy Exp $
 #
 # Complete copyright notice follows below.
 
@@ -98,17 +98,18 @@ Leave off the http:// from the site.
 package WWW::Search::AltaVista;
 
 use strict;
+use warnings;
 
 use Carp ();
 use Date::Manip;
 use WWW::Search qw( generic_option strip_tags unescape_query );
 use WWW::Search::Result;
 
-use strict;
 use base 'WWW::Search';
+
 our $MAINTAINER = 'Martin Thurn <mthurn@cpan.org>';
 our
-$VERSION = do { my @r = (q$Revision: 2.904 $ =~ /\d+/g); sprintf "%d."."%03d" x $#r, @r };
+$VERSION = do { my @r = (q$Revision: 2.905 $ =~ /\d+/g); sprintf "%d."."%03d" x $#r, @r };
 
 sub _undef_to_emptystring
   {

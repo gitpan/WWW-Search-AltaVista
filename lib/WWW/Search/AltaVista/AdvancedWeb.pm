@@ -2,9 +2,13 @@
 # AdvancedWeb.pm
 # by Jim Smyser
 # Copyright (c) 1999 by Jim Smyser & USC/ISI
-# $Id: AdvancedWeb.pm,v 2.83 2007/05/20 14:05:44 Daddy Exp $
+# $Id: AdvancedWeb.pm,v 2.85 2008/01/21 02:04:50 Daddy Exp $
 #############################################################
 
+package WWW::Search::AltaVista::AdvancedWeb;
+
+use strict;
+use warnings;
 
 =head1 NAME
 
@@ -106,20 +110,22 @@ MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 1.9 - First hack version release.
 
 =cut
-#'
 
 #####################################################################
 
-package WWW::Search::AltaVista::AdvancedWeb;
-
-use strict;
-
+use WWW::Search qw( generic_option );
+use WWW::Search::AltaVista;
 use base 'WWW::Search::AltaVista';
-use WWW::Search (generic_option);
-our
-$VERSION = do { my @r = (q$Revision: 2.83 $ =~ /\d+/g); sprintf "%d."."%03d" x $#r, @r };
 
-# private
+our
+$VERSION = do { my @r = (q$Revision: 2.85 $ =~ /\d+/g); sprintf "%d."."%03d" x $#r, @r };
+
+=head2 native_setup_search
+
+This private method does the heavy lifting after native_query() is called.
+
+=cut
+
 sub native_setup_search
 {
     my($self, $native_query, $native_options_ref) = @_;

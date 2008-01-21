@@ -1,6 +1,6 @@
 # AltaVista/Intranet.pm
 # by Martin Thurn
-# $Id: Intranet.pm,v 1.11 2007/08/22 00:49:42 Daddy Exp $
+# $Id: Intranet.pm,v 1.12 2008/01/21 02:04:11 Daddy Exp $
 #
 # Complete copyright notice follows below.
 
@@ -94,6 +94,7 @@ First publicly-released version.
 package WWW::Search::AltaVista::Intranet;
 
 use strict;
+use warnings;
 
 use base 'WWW::Search::AltaVista';
 use Carp;

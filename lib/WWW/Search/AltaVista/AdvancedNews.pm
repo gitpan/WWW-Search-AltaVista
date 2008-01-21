@@ -1,6 +1,6 @@
 # by John Heidemann
 # Copyright (C) 1996 by USC/ISI
-# $Id: AdvancedNews.pm,v 1.3 2007/08/22 00:49:41 Daddy Exp $
+# $Id: AdvancedNews.pm,v 1.4 2008/01/21 02:04:11 Daddy Exp $
 #
 # Complete copyright notice follows below.
 
@@ -55,6 +55,7 @@ MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 package WWW::Search::AltaVista::AdvancedNews;
 
 use strict;
+use warnings;
 
 use base 'WWW::Search::AltaVista';
 

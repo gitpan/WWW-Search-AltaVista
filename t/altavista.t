@@ -1,4 +1,4 @@
-# $rcs = ' $Id: altavista.t,v 1.11 2007/06/27 19:27:14 Daddy Exp $ ' ;
+# $rcs = ' $Id: altavista.t,v 1.12 2008/01/21 02:06:54 Daddy Exp $ ' ;
 
 use ExtUtils::testlib;
 use Test::More no_plan;
@@ -6,6 +6,7 @@ use Test::More no_plan;
 BEGIN { use_ok('WWW::Search') };
 BEGIN { use_ok('WWW::Search::Test', qw( tm_new_engine tm_run_test )) };
 BEGIN { use_ok('WWW::Search::AltaVista') };
+# BEGIN { use_ok('WWW::Search::AltaVista::AdvancedWeb') };
 
 &tm_new_engine('AltaVista');
 my $iDebug = 0;
@@ -37,10 +38,9 @@ foreach my $oResult (@ao)
          'result description is not empty');
   } # foreach
 
-DEBUG_NOW:
-goto SKIP_PHRASE_TEST;
+# goto SKIP_PHRASE_TEST;
 diag("Sending phrase query to altavista.com...");
-$iDebug = 1;
+$iDebug = 0;
 $iDump = 0;
 # $WWW::Search::Test::oSearch->{_allow_empty_query} = 1;
 $WWW::Search::Test::oSearch->native_query('junk crap bile', {
@@ -86,6 +86,10 @@ diag("Sending multi-page web query to altavista.com...");
 # This query returns 3 (or more) pages of results:
 &tm_run_test(0, 'Cheddar', 51, undef, $iDebug);
 SKIP_WEB:
+;
+DEBUG_NOW:
+;
+ADVANCEDWEB:
 ;
 &tm_new_engine('AltaVista::AdvancedWeb');
 # goto SKIP_ADVANCEDWEB;

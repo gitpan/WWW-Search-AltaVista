@@ -1,6 +1,6 @@
 # DE.pm
 # by Martin Thurn
-# $Id: DE.pm,v 1.4 2007/08/22 00:49:42 Daddy Exp $
+# $Id: DE.pm,v 1.5 2008/01/21 02:04:11 Daddy Exp $
 
 =head1 NAME
 
@@ -32,10 +32,11 @@ Martin Thurn C<mthurn@cpan.org>
 package WWW::Search::AltaVista::DE;
 
 use strict;
+use warnings;
 
 use base 'WWW::Search::AltaVista';
 our
-$VERSION = sprintf("%d.%02d", q$Revision: 1.4 $ =~ /(\d+)\.(\d+)/o);
+$VERSION = sprintf("%d.%02d", q$Revision: 1.5 $ =~ /(\d+)\.(\d+)/o);
 
 =head2 native_setup_search
 

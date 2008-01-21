@@ -1,5 +1,5 @@
 # AltaVista/Intranet3.pm
-# $Id: Intranet3.pm,v 1.4 2007/05/20 14:05:44 Daddy Exp $
+# $Id: Intranet3.pm,v 1.5 2008/01/21 02:04:11 Daddy Exp $
 #
 # Complete copyright notice follows below.
 
@@ -91,6 +91,7 @@ First publicly-released version.
 package WWW::Search::AltaVista::Intranet3;
 
 use strict;
+use warnings;
 
 use base 'WWW::Search::AltaVista';
 use Carp;

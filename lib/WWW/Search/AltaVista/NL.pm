@@ -3,7 +3,7 @@
 # by Erik Smit
 # Copyright (C) 1996-1998 by USC/ISI
 # Copyright (C) 2001 by Different Soft
-# $Id: NL.pm,v 1.112 2007/08/11 15:04:15 Daddy Exp $
+# $Id: NL.pm,v 1.113 2008/01/21 02:04:11 Daddy Exp $
 #
 # Complete copyright notice follows below.
 #
@@ -60,13 +60,14 @@ There are none defined here; see WWW::Search.
 package WWW::Search::AltaVista::NL;
 
 use strict;
+use warnings;
 
 use base 'WWW::Search::AltaVista';
 use Carp ();
 use WWW::Search qw( generic_option );
 use WWW::SearchResult;
 our
-$VERSION = do { my @r = (q$Revision: 1.112 $ =~ /\d+/g); sprintf "%d."."%03d" x $#r, @r };
+$VERSION = do { my @r = (q$Revision: 1.113 $ =~ /\d+/g); sprintf "%d."."%03d" x $#r, @r };
 
 =head1 PRIVATE METHODS
 

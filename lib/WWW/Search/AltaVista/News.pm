@@ -1,7 +1,7 @@
 # News.pm
 # by John Heidemann
 # Copyright (C) 1996 by USC/ISI
-# $Id: News.pm,v 2.107 2007/08/20 00:19:13 Daddy Exp $
+# $Id: News.pm,v 2.108 2008/01/21 02:04:11 Daddy Exp $
 #
 # Complete copyright notice follows below.
 
@@ -36,11 +36,12 @@ be done through WWW::Search objects.
 package WWW::Search::AltaVista::News;
 
 use strict;
+use warnings;
 
 use base 'WWW::Search::AltaVista';
 
 our
-$VERSION = do { my @r = (q$Revision: 2.107 $ =~ /\d+/g); sprintf "%d."."%03d" x $#r, @r };
+$VERSION = do { my @r = (q$Revision: 2.108 $ =~ /\d+/g); sprintf "%d."."%03d" x $#r, @r };
 our $MAINTAINER = 'Martin Thurn <mthurn@cpan.org>';
 
 =head2 native_setup_search (private)
