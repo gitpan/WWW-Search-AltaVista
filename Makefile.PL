@@ -1,9 +1,9 @@
-# $rcs = ' $Id: Makefile.PL,v 1.12 2008/01/21 02:02:00 Daddy Exp $ ' ;
+# $rcs = ' $Id: Makefile.PL,v 1.14 2008/02/01 03:01:17 Daddy Exp $ ' ;
 
 use inc::Module::Install;
 
 name('WWW-Search-AltaVista');
-version(2.149);
+version(2.151);
 
 author('Martin Thurn <mthurn@cpan.org>');
 license('perl');
@@ -15,6 +15,7 @@ requires('HTML::TokeParser');
 build_requires('Test::More');
 build_recommends('Test::Pod');
 build_recommends('Test::Pod::Coverage');
+requires('WWW::Search');
 # We need the version with tm_run_test():
 requires('WWW::Search::Test' => 2.263);
 

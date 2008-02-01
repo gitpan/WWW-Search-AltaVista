@@ -19,6 +19,7 @@ no_index:
 requires: 
   Date::Manip: 0
   HTML::TokeParser: 0
+  WWW::Search: 0
   WWW::Search::Test: 2.263
   perl: 5.004
-version: 2.149
+version: 2.151
