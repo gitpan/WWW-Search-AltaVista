@@ -1,10 +1,11 @@
-# $rcs = ' $Id: altavista.t,v 1.12 2008/01/21 02:06:54 Daddy Exp $ ' ;
+# $rcs = ' $Id: altavista.t,v 1.13 2008/07/14 03:32:59 Martin Exp $ ' ;
 
 use ExtUtils::testlib;
 use Test::More no_plan;
 
-BEGIN { use_ok('WWW::Search') };
-BEGIN { use_ok('WWW::Search::Test', qw( tm_new_engine tm_run_test )) };
+use WWW::Search;
+use WWW::Search::Test qw( tm_new_engine tm_run_test );
+
 BEGIN { use_ok('WWW::Search::AltaVista') };
 # BEGIN { use_ok('WWW::Search::AltaVista::AdvancedWeb') };
 
@@ -21,7 +22,7 @@ $iDebug = 0;
 $iDump = 0;
 &tm_run_test(0, $WWW::Search::Test::bogus_query, 0, 0, $iDebug, $iDump);
 
-# DEBUG_NOW:
+DEBUG_NOW:
 diag("Sending 1-page query to altavista.com...");
 $iDebug = 0;
 $iDump = 0;
