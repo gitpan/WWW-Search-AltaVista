@@ -358,10 +358,12 @@ or the specialized AltaVista searches described in options.
 
 =head1 AUTHOR
 
-C<WWW::Search::AltaVista> was written by John Heidemann,
-C<johnh@isi.edu>.
-C<WWW::Search::AltaVista> is maintained by Martin Thurn,
-C<mthurn@cpan.org>.
+Written by John Heidemann, C<johnh@isi.edu>;
+maintained by Martin Thurn, C<mthurn@cpan.org>.
+
+=head1 LICENSE
+
+This software is released under the same license as Perl itself.
 
 =head1 COPYRIGHT
 

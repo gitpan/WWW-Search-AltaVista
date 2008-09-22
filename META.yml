@@ -1,16 +1,18 @@
 ---
+abstract: 'class for searching www.altavista.com'
 author:
-  - 'Martin Thurn <mthurn@cpan.org>'
+  - 'Written by John Heidemann, C<johnh@isi.edu>;'
 build_requires:
   Test::More: 0
   Test::Pod: 0
   Test::Pod::Coverage: 0
 distribution_type: module
-generated_by: 'Module::Install version 0.75'
+generated_by: 'Module::Install version 0.76'
 license: perl
 meta-spec:
-  url: http://module-build.sourceforge.net/META-spec-v1.3.html
-  version: 1.3
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: WWW::Search::AltaVista
 name: WWW-Search-AltaVista
 no_index:
   directory:
@@ -22,4 +24,6 @@ requires:
   WWW::Search: 2.561
   WWW::Search::Test: 2.263
   perl: 5.004
-version: 2.152
+resources:
+  license: http://dev.perl.org/licenses/
+version: 2.153
