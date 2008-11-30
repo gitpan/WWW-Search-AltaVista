@@ -1,9 +1,9 @@
-# $rcs = ' $Id: Makefile.PL,v 1.18 2008/09/22 01:46:56 Martin Exp $ ' ;
+# $Id: Makefile.PL,v 1.19 2008/11/28 17:56:47 Martin Exp $
 
 use inc::Module::Install;
 
 all_from('lib/WWW/Search/AltaVista.pm');
-version(2.153);
+version(2.154);
 
 requires( perl => 5.004 );
 requires('Date::Manip');
@@ -17,6 +17,8 @@ test_recommends('Test::Pod::Coverage');
 requires('WWW::Search' => 2.561);
 # We need the version with tm_run_test():
 requires('WWW::Search::Test' => 2.263);
+# We need the version with the fixed test_most_results():
+requires('WWW::Search::Test' => 2.284);
 
 WriteAll;
 
